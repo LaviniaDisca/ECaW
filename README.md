@@ -12,7 +12,7 @@
         </h1>
         <div role="contentinfo">
             <section typeof="sa:AuthorsList">
-                <h2>Autori</h2>
+                <h3>Autori</h3>
                 <ul>
                     <li typeof="sa:ContributorRole" property="schema:author">
                         <span typeof="schema:Person">
@@ -46,7 +46,7 @@
         </div>
     </header>
     <section typeof="sa:Abstract" id="abstract" role="doc-abstract">
-        <h2>Abstract</h2>
+        <h3>Abstract</h3>
         <p>
             E-card Web Editor este o aplicatie pentru crearea digitala a unor ilustrate si impartasirea lor cu cei dragi.
         </p>
