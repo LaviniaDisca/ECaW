@@ -45,7 +45,7 @@
         </div>
     </header>
     <section typeof="sa:Abstract" id="abstract" role="doc-abstract">
-        <h3>Introduction</h3>
+        <h3>Introducere</h3>
         <p>
             E-card Web Editor(ECaW) este o aplicatie web extensibila pentru crearea digitala a unor ilustrate de diverse categorii si impartasirea acestora cu cei dragi. Utilizatorii vor avea la dispozitie un canvas unde vor putea crea cardul dorit.
         </p>
@@ -80,28 +80,28 @@
         <h3>Instrumente disponibile</h3>
         <ul>
             <li>
-                <b>Pencil drawing</b>: Draw anything by hand onto the canvas.
+                <b>Pencil drawing</b>: Deseneaza linii pe canvas.
             </li>
             <li>
-                <b>Text</b>: Insert text into the card.
+                <b>Text</b>: Inseareaza text.
             </li>
             <li>
-                <b>Shape</b>: Create a shape to draw (a square, star, rectangle, etc).
+                <b>Shape</b>: Creeaza o forma simpla(patrat, dreptunghi, stea, etc).
             </li>
             <li>
-                <b>Photo</b>: User can insert a photo either from his device or from the Imgur API.
+                <b>Photo</b>: Inseareaza poze de pe dispozitivul local sau de pe API-ul de la Imgur.
             </li>
             <li>
-                <b>Resize</b>: Resize any object drawn.
+                <b>Resize</b>: Ajusteaza marimea oricarui obiect desenat.
             </li>
             <li>
-                <b>Insert audio</b>: Add sound from the local storage.
+                <b>Insert audio</b>: Adauga fundal sonor la proiect printr-un fisier .mp3 local.
             </li>
             <li>
-                <b>Save</b>: Save the current project.
+                <b>Save</b>: Salveaza proiectul in baza de date.
             </li>
             <li>
-                <b>Share</b>: Either share the project on social media or give acces to other users to edit it.
+                <b>Share</b>: Impartaseste proiectul fie pe retele sociale, email, etc./ Permite accesul altor utilizatori sa isi adauge contributia la proiect.
             </li>
 
         </ul>
