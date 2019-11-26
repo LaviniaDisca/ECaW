@@ -13,7 +13,7 @@
         </h1>
         <div role="contentinfo">
             <section typeof="sa:AuthorsList">
-                <h2>Autori</h2>
+                <h3>Autori</h3>
                 <ul>
                     <li typeof="sa:ContributorRole" property="schema:author">
                         <span typeof="schema:Person">
@@ -47,33 +47,84 @@
         </div>
     </header>
     <section typeof="sa:Abstract" id="abstract" role="doc-abstract">
-        <h2>Abstract</h2>
+        <h3>Introduction</h3>
         <p>
-            E-card Web Editor este o aplicatie pentru crearea digitala a unor ilustrate si impartasirea lor cu cei dragi.
-        </p>
-    </section>
-    <section>
-        <h3>Obiective</h3>
-        <p>
-            Ne propunem ca la accesarea paginii web, utilizatorul sa fie intampinat de pagina de logare in aplicatie. Dupa logare, utilizatorul poate sa acceseze e-cardurile create anterior sau la care are acces sau sa creeze unul nou. Optiunile de editare ale unui
-            proiect sunt: pencil drawing, insert shape, eraser, insert photo, resizing, insert audio, insert text, add comment.
-        </p>
-    </section>
-    <section>
-        <h3>
-            Interactiune server-client
-        </h3>
-        <p>
-            Serverul primeste cerere de autentificare de la utilizatori si permite sau nu accesul. Odata logati, utilizatorii pot cere proiectele la care au acces. Dupa ce editeaza un proiect si il salveaza, serverul primeste o cerere de updatare a proiectului.
+            E-card Web Editor(ECaW) este o aplicatie web extensibila pentru crearea digitala a unor ilustrate de diverse categorii si impartasirea acestora cu cei dragi. Utilizatorii vor avea la dispozitie un canvas unde vor putea crea cardul dorit.
         </p>
     </section>
     <section id="techs">
         <h3>Tehnologii utilizate</h3>
         <ul>
             <li>JavaScript pentru implementarea functionalitatilor</li>
-            <li>HTML si CSS pentru vizualizarea paginilir,respectiv pentru stilizarea paginilor</li>
+            <li>HTML si CSS pentru vizualizarea paginilor,respectiv pentru stilizarea lor</li>
             <li>MongoDB pentru managementul bazei de date</li>
-            <li>Express js pentru implementarea serverului</li>
+            <li>Node.js pentru implementarea serverului</li>
+        </ul>
+    </section>
+    <section id="pages">
+        <h3>Paginile Web</h3>
+        <ul>
+            <li>
+                <b>Login</b>: Utilizatorii se vor putea loga fie cu contul de facebook, fie cu contul de ECaW. Login-ul este necesar pentru a avea acces la proiectele personale sau la cele private la care are acces oferit de owner-ul proiectului.
+            </li>
+            <li>
+                <b>Register</b>: In cazul in care utilizatorul nu are cont pe platforma, acesta isi va putea crea unul pe aceasta pagina.
+            </li>
+            <li>
+                <b>Home</b>: Aici utilizatorul va putea vedea lista proiectelor la care are acces, sau sa creeze un nou proiect. Va putea vedea continutul fiecarui proiect pentru a-l edita, descarca sau a-l impartasi pe Facebook, email, etc.
+            </li>
+            <li>
+                <b>Edit</b>: Pe aceasta pagina utilizatorul isi va putea da frau liber imaginatiei. Aici va putea sa isi creeze cardul pe care il doreste si sa impartaseasca accesul la proiect cu alti utilzatori.
+            </li>
+        </ul>
+    </section>
+    <section id="tools">
+        <h3>Instrumente disponibile</h3>
+        <ul>
+            <li>
+                <b>Pencil drawing</b>: Draw anything by hand onto the canvas.
+            </li>
+            <li>
+                <b>Text</b>: Insert text into the card.
+            </li>
+            <li>
+                <b>Shape</b>: Create a shape to draw (a square, star, rectangle, etc).
+            </li>
+            <li>
+                <b>Photo</b>: User can insert a photo either from his device or from the Imgur API.
+            </li>
+            <li>
+                <b>Resize</b>: Resize any object drawn.
+            </li>
+            <li>
+                <b>Insert audio</b>: Add sound from the local storage.
+            </li>
+            <li>
+                <b>Save</b>: Save the current project.
+            </li>
+            <li>
+                <b>Share</b>: Either share the project on social media or give acces to other users to edit it.
+            </li>
+
+        </ul>
+    </section>
+    <section id="server">
+        <h3>
+            Server end points
+        </h3>
+        <ul>
+            <li>
+                <b>/login</b>: Va verifica credentialele utilizatorului.
+            </li>
+            <li>
+                <b>/register</b>: Va crea contul utilizatorului.
+            </li>
+            <li>
+                <b>/projects</b>: Va trimite proiectele utilizatorului.
+            </li>
+            <li>
+                <b>/projects/{id}</b>: In functie de tipul cererii(GET/POST/DELETE) va trimite proiectul cu acel id, va suprascrie proiectul respectiv va sterge proiectul.
+            </li>
         </ul>
     </section>
     <section>
@@ -81,8 +132,9 @@
             API-uri folosite
         </h3>
         <ul>
-            <li>Imgur - poze</li>
-            <li>Giphy - GIFs</li>
+            <li>
+                <b>Imgur</b>: Va furniza pozele pe care le vor cauta utilizatorii in interiorul aplicatiei, pentru a fi incluse in proiect.
+            </li>
         </ul>
     </section>
     <section>
