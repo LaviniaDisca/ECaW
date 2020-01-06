@@ -7,3 +7,19 @@ class Rectangle {
         this.color = color;
     }
 }
+
+//TODO: Add text
+
+//TODO: Resize
+
+//TODO: Move
+
+//TODO: Fill
+
+//todo: fill/stroke
+
+//todo : style buttons
+
+//todo: draw history
+
+//todo: save to server
