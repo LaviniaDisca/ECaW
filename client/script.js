@@ -1,7 +1,11 @@
 let canvas = document.querySelector('canvas');
-let currentShape;
+let selectedOption;
 let color = "#000";
 let history = [];
+let selectedShape = undefined;
+let currentHandle = undefined;
+let expectResize = false;
+let selectedItem = undefined;
 canvas.width = window.innerWidth - document.getElementById('options').offsetWidth;
 canvas.height = window.innerHeight;
 
@@ -23,7 +27,7 @@ canvas.addEventListener('mousemove', (e) => {
 });
 
 canvas.addEventListener("click", (event) => {
-    switch (currentShape) {
+    switch (selectedOption) {
         case "rectangle":
             drawRectangle(event.offsetX, event.offsetY);
             break;
@@ -39,18 +43,28 @@ canvas.addEventListener("click", (event) => {
 });
 
 function redraw() {
+    // clear the canvas
+    context.clearRect(0, 0, canvas.width, canvas.height);
     for (let i in history) {
         if (history[i] instanceof Rectangle) {
-            drawRectangle(history[i].x, history[i].y, history[i].width, history[i].height, history[i].color);
+            drawRectangle(history[i].x, history[i].y, history[i].toX, history[i].toY, history[i].color);
         } else if (history[i] instanceof Line) {
             drawLine(history[i].x, history[i].y, history[i].toX, history[i].toY, history[i].color)
         } else if (history[i] instanceof Ellipse) {
             drawEllipse(history[i].x, history[i].y, history[i].toX, history[i].toY, history[i].color)
         }
     }
+    if (typeof selectedShape !== "undefined") {
+        drawSelectedShape();
+    }
 }
 
 function changeCurrentShape(text) {
+    if (selectedOption !== "selector") {
+        selectedShape = undefined;
+        currentHandle = undefined;
+        redraw();
+    }
     document.getElementById('current').innerHTML = `Shape : ${text}`;
 }
 
@@ -60,40 +74,47 @@ let startY;
 let endX;
 let endY;
 
+function drawSelectedShape() {
+    drawRectangle(selectedShape.x, selectedShape.y, selectedShape.toX, selectedShape.toY, "red");
+    for (let i in selectedShape.selectionHandles) {
+        drawRectangle(selectedShape.selectionHandles[i].x,
+            selectedShape.selectionHandles[i].y,
+            selectedShape.selectionHandles[i].x + selectedShape.handleSize,
+            selectedShape.selectionHandles[i].y + selectedShape.handleSize, "red", true)
+    }
+}
+
 function handleMouseDown(e) {
-    if (currentShape === "selector") {
+    e.preventDefault();
+    e.stopPropagation();
+    startX = e.offsetX;
+    startY = e.offsetY;
+    isDown = true;
+    if (selectedOption === "selector") {
+        if (typeof currentHandle !== "undefined") {
+            return;
+        }
         e.preventDefault();
         e.stopPropagation();
         let found = false;
         history.slice().reverse().forEach((item) => {
-            if (!found && (item.x < e.offsetX && e.offsetX < item.toX) && (item.y < e.offsetY && e.offsetY < item.toY)) {
-                drawRectangle(item.x, item.y, item.toX - item.x, item.toY - item.y, "red");
-                let selectR = new SelectRect(item.x, item.y, item.toX, item.toY);
-                for (let i in selectR.selectionHandles) {
-                    drawRectangle(selectR.selectionHandles[i].x, selectR.selectionHandles[i].y, selectR.handleSize, selectR.handleSize)
-                }
-                found = true;
-            } else if (!found && (item.x > e.offsetX && e.offsetX > item.toX) && (item.y > e.offsetY && e.offsetY > item.toY)) {
-                console.log("found");
-                drawRectangle(item.x, item.y, Math.abs(item.toX - item.x), Math.abs(item.toY - item.y), "red");
-                let selectR = new SelectRect(item.x, item.y, item.toX, item.toY);
-                for (let i in selectR.selectionHandles) {
-                    drawRectangle(selectR.selectionHandles[i].x, selectR.selectionHandles[i].y, selectR.handleSize, selectR.handleSize)
-                }
+            if (!found && (item.x < e.offsetX && e.offsetX < item.toX) && ((item.y < e.offsetY && e.offsetY < item.toY) || (item.y > e.offsetY && e.offsetY > item.toY))) {
+                selectedShape = new SelectRect(item.x, item.y, item.toX, item.toY);
+                selectedItem = item;
                 found = true;
             }
-        })
+            if (!found && (item.x > e.offsetX && e.offsetX > item.toX) && ((item.y < e.offsetY && e.offsetY < item.toY) || (item.y > e.offsetY && e.offsetY > item.toY))) {
+                selectedShape = new SelectRect(item.x, item.y, item.toX, item.toY);
+                selectedItem = item;
+                found = true;
+            }
+        });
+        if (!found) {
+            selectedShape = undefined;
+            selectedItem = undefined;
+        }
     }
-    if (currentShape === "rectangle" || currentShape === "line" || currentShape === "ellipse") {
-        e.preventDefault();
-        e.stopPropagation();
-
-        // save the starting x/y of the rectangle
-        startX = e.offsetX;
-        startY = e.offsetY;
-        // set a flag indicating the drag has begun
-        isDown = true;
-    }
+    redraw();
 }
 
 function handleMouseUp(e) {
@@ -102,16 +123,15 @@ function handleMouseUp(e) {
 
     // the drag is over, clear the dragging flag
     isDown = false;
-    if (currentShape === "rectangle" && endX !== undefined) {
+    if (selectedOption === "rectangle" && endX !== undefined) {
         history.push(new Rectangle(startX, startY, endX, endY, color));
-    } else if (currentShape === "line" && endX !== undefined) {
+    } else if (selectedOption === "line" && endX !== undefined) {
         history.push(new Line(startX, startY, endX, endY, color));
-    } else if (currentShape === "ellipse" && endX !== undefined) {
+    } else if (selectedOption === "ellipse" && endX !== undefined) {
         history.push(new Ellipse(startX, startY, endX, endY, color));
     }
     endX = undefined;
     endY = undefined;
-    //redraw();
     console.log(history);
 }
 
@@ -119,43 +139,94 @@ function handleMouseMove(e) {
     e.preventDefault();
     e.stopPropagation();
 
+    endX = e.offsetX;
+    endY = e.offsetY;
+
+
+    if (typeof currentHandle !== "undefined" && isDown) {
+        if (selectedOption === "selector") {
+            switch (currentHandle) {
+                case 3:
+                    selectedShape.x = endX;
+                    selectedItem.x = endX;
+                    break;
+            }
+            selectedShape.updateHandles();
+        }
+    } else if (typeof selectedShape !== "undefined") {
+        currentHandle = undefined;
+        for (let i = 0; i < 8; i++) {
+            let handle = selectedShape.selectionHandles[i];
+            if (handle.x <= e.offsetX && e.offsetX <= handle.x + selectedShape.handleSize
+                && handle.y <= e.offsetY && e.offsetY <= handle.y + selectedShape.handleSize) {
+                currentHandle = i;
+            }
+        }
+        switch (currentHandle) {
+            case 0:
+                canvas.style.cursor = 'nw-resize';
+                break;
+            case 1:
+                canvas.style.cursor = 'n-resize';
+                break;
+            case 2:
+                canvas.style.cursor = 'ne-resize';
+                break;
+            case 3:
+                canvas.style.cursor = 'w-resize';
+                break;
+            case 4:
+                canvas.style.cursor = 'e-resize';
+                break;
+            case 5:
+                canvas.style.cursor = 'sw-resize';
+                break;
+            case 6:
+                canvas.style.cursor = 's-resize';
+                break;
+            case 7:
+                canvas.style.cursor = 'se-resize';
+                break;
+            default:
+                canvas.style.cursor = 'crosshair';
+                break;
+        }
+    }
+
     // if we're not dragging, just return
     if (!isDown) {
         return;
     }
 
-    // get the current mouse position
-    endX = e.offsetX;
-    endY = e.offsetY;
-
-    // Put your mousemove stuff here
-
-    // clear the canvas
-    context.clearRect(0, 0, canvas.width, canvas.height);
-
     // draw a new rect from the start position
     // to the current mouse position
 
     redraw();
-    if (currentShape === "rectangle") {
-        drawRectangle(startX, startY, endX - startX, endY - startY, color);
-    } else if (currentShape === "line") {
+    if (selectedOption === "rectangle") {
+        drawRectangle(startX, startY, endX, endY, color);
+    } else if (selectedOption === "line") {
         drawLine(startX, startY, endX, endY, color);
-    } else if (currentShape === "ellipse") {
+    } else if (selectedOption === "ellipse") {
         drawEllipse(startX, startY, endX, endY, color);
     }
 
 }
 
 
-function drawRectangle(x, y, width, height, color) {
-    context.strokeStyle = color;
-    context.strokeRect(x, y, width, height);
+function drawRectangle(x, y, toX, toY, color, fill = false) {
+    if (!fill) {
+        context.strokeStyle = color;
+        context.strokeRect(x, y, toX - x, toY - y);
+    } else {
+        context.fillStyle = color;
+        context.fillRect(x, y, toX - x, toY - y);
+    }
+
 }
 
 document.getElementById('rectangle').addEventListener('click', () => {
-    currentShape = "rectangle";
-    changeCurrentShape(currentShape);
+    selectedOption = "rectangle";
+    changeCurrentShape(selectedOption);
 });
 
 function drawLine(x, y, toX, toY, color) {
@@ -167,8 +238,8 @@ function drawLine(x, y, toX, toY, color) {
 }
 
 document.getElementById("line").addEventListener("click", () => {
-    currentShape = "line";
-    changeCurrentShape(currentShape);
+    selectedOption = "line";
+    changeCurrentShape(selectedOption);
 });
 
 function drawCircle(x, y, color) {
@@ -181,8 +252,8 @@ function drawCircle(x, y, color) {
 }
 
 document.getElementById("circle").addEventListener("click", () => {
-    currentShape = "circle";
-    changeCurrentShape(currentShape);
+    selectedOption = "circle";
+    changeCurrentShape(selectedOption);
 });
 
 function drawEllipse(x, y, toX, toY, color) {
@@ -194,14 +265,14 @@ function drawEllipse(x, y, toX, toY, color) {
 
 
 document.getElementById('ellipse').addEventListener('click', () => {
-    currentShape = "ellipse";
-    changeCurrentShape(currentShape);
+    selectedOption = "ellipse";
+    changeCurrentShape(selectedOption);
 });
 
 
 document.getElementById("selector").addEventListener('click', () => {
-    currentShape = "selector";
-    changeCurrentShape(currentShape);
+    selectedOption = "selector";
+    changeCurrentShape(selectedOption);
     // drawRectangle(10,10,90,90);
     // let r = new SelectRect(10, 10, 100, 100);
     // for (let i in r.selectionHandles){
