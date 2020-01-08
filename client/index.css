@@ -19,3 +19,7 @@ button {
 body {
     margin: 0;
 }
+
+input{
+    line-height: 1em;
+}

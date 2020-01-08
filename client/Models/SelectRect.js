@@ -1,6 +1,6 @@
 class SelectRect {
     selectionHandles = [];
-    handleSize = 6;
+    handleSize = 10;
 
 
     constructor(x, y, toX, toY) {
