@@ -1,6 +1,6 @@
 let canvas = document.querySelector('canvas');
 let currentShape;
-let color="#000";
+let color = "#000";
 let history = [];
 canvas.width = window.innerWidth - document.getElementById('options').offsetWidth;
 canvas.height = window.innerHeight;
@@ -61,6 +61,29 @@ let endX;
 let endY;
 
 function handleMouseDown(e) {
+    if (currentShape === "selector") {
+        e.preventDefault();
+        e.stopPropagation();
+        let found = false;
+        history.slice().reverse().forEach((item) => {
+            if (!found && (item.x < e.offsetX && e.offsetX < item.toX) && (item.y < e.offsetY && e.offsetY < item.toY)) {
+                drawRectangle(item.x, item.y, item.toX - item.x, item.toY - item.y, "red");
+                let selectR = new SelectRect(item.x, item.y, item.toX, item.toY);
+                for (let i in selectR.selectionHandles) {
+                    drawRectangle(selectR.selectionHandles[i].x, selectR.selectionHandles[i].y, selectR.handleSize, selectR.handleSize)
+                }
+                found = true;
+            } else if (!found && (item.x > e.offsetX && e.offsetX > item.toX) && (item.y > e.offsetY && e.offsetY > item.toY)) {
+                console.log("found");
+                drawRectangle(item.x, item.y, Math.abs(item.toX - item.x), Math.abs(item.toY - item.y), "red");
+                let selectR = new SelectRect(item.x, item.y, item.toX, item.toY);
+                for (let i in selectR.selectionHandles) {
+                    drawRectangle(selectR.selectionHandles[i].x, selectR.selectionHandles[i].y, selectR.handleSize, selectR.handleSize)
+                }
+                found = true;
+            }
+        })
+    }
     if (currentShape === "rectangle" || currentShape === "line" || currentShape === "ellipse") {
         e.preventDefault();
         e.stopPropagation();
@@ -80,7 +103,7 @@ function handleMouseUp(e) {
     // the drag is over, clear the dragging flag
     isDown = false;
     if (currentShape === "rectangle" && endX !== undefined) {
-        history.push(new Rectangle(startX, startY, endX - startX, endY - startY, color));
+        history.push(new Rectangle(startX, startY, endX, endY, color));
     } else if (currentShape === "line" && endX !== undefined) {
         history.push(new Line(startX, startY, endX, endY, color));
     } else if (currentShape === "ellipse" && endX !== undefined) {
@@ -88,7 +111,7 @@ function handleMouseUp(e) {
     }
     endX = undefined;
     endY = undefined;
-    redraw();
+    //redraw();
     console.log(history);
 }
 
@@ -173,4 +196,15 @@ function drawEllipse(x, y, toX, toY, color) {
 document.getElementById('ellipse').addEventListener('click', () => {
     currentShape = "ellipse";
     changeCurrentShape(currentShape);
+});
+
+
+document.getElementById("selector").addEventListener('click', () => {
+    currentShape = "selector";
+    changeCurrentShape(currentShape);
+    // drawRectangle(10,10,90,90);
+    // let r = new SelectRect(10, 10, 100, 100);
+    // for (let i in r.selectionHandles){
+    //     drawRectangle(r.selectionHandles[i].x,r.selectionHandles[i].y,r.handleSize,r.handleSize)
+    // }
 });
