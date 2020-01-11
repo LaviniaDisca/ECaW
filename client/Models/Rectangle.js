@@ -13,11 +13,7 @@ class Rectangle {
 
 //TODO: Add text
 
-//TODO: Move
-
 //TODO: Fill
-
-//todo: fill/stroke
 
 //todo : style buttons
 

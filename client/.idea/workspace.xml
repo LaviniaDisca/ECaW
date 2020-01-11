@@ -4,11 +4,9 @@
     <list default="true" id="8ef2a1c9-f8a9-4cc5-a1b2-3ebc57edd92d" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Models/Circle.js" beforeDir="false" afterPath="$PROJECT_DIR$/Models/Circle.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Models/Ellipse.js" beforeDir="false" afterPath="$PROJECT_DIR$/Models/Ellipse.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Models/Rectangle.js" beforeDir="false" afterPath="$PROJECT_DIR$/Models/Rectangle.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Models/SelectRect.js" beforeDir="false" afterPath="$PROJECT_DIR$/Models/SelectRect.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/index.css" beforeDir="false" afterPath="$PROJECT_DIR$/index.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/index.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/script.js" beforeDir="false" afterPath="$PROJECT_DIR$/script.js" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -71,7 +69,8 @@
       <workItem from="1578305575363" duration="12377000" />
       <workItem from="1578479052011" duration="3271000" />
       <workItem from="1578486210131" duration="8046000" />
-      <workItem from="1578506071669" duration="4243000" />
+      <workItem from="1578506071669" duration="4850000" />
+      <workItem from="1578741013654" duration="11216000" />
     </task>
     <servers />
   </component>

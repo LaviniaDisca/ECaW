@@ -1,7 +1,6 @@
 canvas {
     position: relative;
     left: 15%;
-    border: black solid 2px;
     cursor: crosshair;
 }
 
