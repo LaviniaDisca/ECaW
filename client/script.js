@@ -1,6 +1,6 @@
 let canvas = document.querySelector('canvas');
 let selectedOption;
-let color = "#000";
+let color = "#000000";
 let history = [];
 let selectedShape = undefined;
 let currentHandle = undefined;
@@ -13,27 +13,53 @@ let selectedItem = undefined;
 canvas.width = window.innerWidth - 0.15 * window.innerWidth;
 canvas.height = window.innerHeight;
 
+//ghost canvas used for fill
+let canvasBack = document.createElement("canvas");
+canvasBack.width = canvas.width;
+canvasBack.height = canvas.height;
+ghostContext = canvasBack.getContext("2d");
+
 let context = canvas.getContext('2d');
+//a clean white canvas is needed for the flood fill tool
+drawRectangle(context, 0, 0, canvas.width, canvas.height, "#ffffff", true);
 
 /**
  * Clears the screen and draws all the shapes from history
  */
 function redraw() {
-    context.clearRect(0, 0, canvas.width, canvas.height);
+    context.clearRect(0, 0, context.canvas.width, context.canvas.height);
+    drawRectangle(context, 0, 0, canvas.width, canvas.height, "#ffffff", true);
+    context.drawImage(canvasBack, 0, 0);
     for (let i = 0; i < history.length; i++) {
         if (history[i] instanceof Rectangle) {
-            drawRectangle(history[i].x, history[i].y, history[i].toX, history[i].toY, history[i].color, history[i].fill);
+            drawRectangle(context, history[i].x, history[i].y, history[i].toX, history[i].toY, history[i].color, history[i].fill);
         } else if (history[i] instanceof Line) {
-            drawLine(history[i].x, history[i].y, history[i].toX, history[i].toY, history[i].color, history[i].fill)
+            drawLine(context, history[i].x, history[i].y, history[i].toX, history[i].toY, history[i].color, history[i].fill);
         } else if (history[i] instanceof Ellipse) {
-            drawEllipse(history[i].x, history[i].y, history[i].toX, history[i].toY, history[i].color, history[i].fill)
+            drawEllipse(context, history[i].x, history[i].y, history[i].toX, history[i].toY, history[i].color, history[i].fill);
         } else if (history[i] instanceof Circle) {
-            drawCircle(history[i].centerX, history[i].centerY, history[i].radius, history[i].color, history[i].fill)
+            drawCircle(context, history[i].centerX, history[i].centerY, history[i].radius, history[i].color, history[i].fill);
         }
     }
     // Draw the selection rect if there's one
     if (typeof selectedShape !== "undefined") {
         drawSelectedShape();
+    }
+}
+
+function drawGhost() {
+    ghostContext.clearRect(0, 0, context.canvas.width, context.canvas.height);
+    ghostContext.drawImage(canvas, 0, 0);
+    for (let i = 0; i < history.length; i++) {
+        if (history[i] instanceof Rectangle) {
+            drawRectangle(ghostContext, history[i].x, history[i].y, history[i].toX, history[i].toY, "#ffffff", history[i].fill);
+        } else if (history[i] instanceof Line) {
+            drawLine(ghostContext, history[i].x, history[i].y, history[i].toX, history[i].toY, "#ffffff", history[i].fill);
+        } else if (history[i] instanceof Ellipse) {
+            drawEllipse(ghostContext, history[i].x, history[i].y, history[i].toX, history[i].toY, "#ffffff", history[i].fill);
+        } else if (history[i] instanceof Circle) {
+            drawCircle(ghostContext, history[i].centerX, history[i].centerY, history[i].radius, "#ffffff", history[i].fill);
+        }
     }
 }
 
@@ -50,12 +76,12 @@ let endY;
  * Draws the selection rect and the necessary handles for resizing
  */
 function drawSelectedShape() {
-    drawRectangle(selectedShape.x, selectedShape.y, selectedShape.toX, selectedShape.toY, "red");
+    drawRectangle(context, selectedShape.x, selectedShape.y, selectedShape.toX, selectedShape.toY, "red");
     for (let i = 0; i < selectedShape.selectionHandles.length; i++) {
         //if the selected shape is a circle we only draw 2 handles
         if (selectedItem instanceof Circle) {
             if (i === 3 || i === 4) {
-                drawRectangle(selectedShape.selectionHandles[i].x,
+                drawRectangle(context, selectedShape.selectionHandles[i].x,
                     selectedShape.selectionHandles[i].y,
                     selectedShape.selectionHandles[i].x + selectedShape.handleSize,
                     selectedShape.selectionHandles[i].y + selectedShape.handleSize, "red", true)
@@ -63,7 +89,7 @@ function drawSelectedShape() {
         }
         //we draw all handles if it's any other shape
         else {
-            drawRectangle(selectedShape.selectionHandles[i].x,
+            drawRectangle(context, selectedShape.selectionHandles[i].x,
                 selectedShape.selectionHandles[i].y,
                 selectedShape.selectionHandles[i].x + selectedShape.handleSize,
                 selectedShape.selectionHandles[i].y + selectedShape.handleSize, "red", true)
@@ -74,7 +100,6 @@ function drawSelectedShape() {
 /**
  * Mouse Handlers
  */
-
 function handleMouseDown(e) {
     e.preventDefault();
     e.stopPropagation();
@@ -101,6 +126,14 @@ function handleMouseDown(e) {
             selectedItem = undefined;
         }
     }
+    if (selectedOption === "fill") {
+        let colorLayerData = context.getImageData(0, 0, canvas.width, canvas.height);
+        let currentPixelLocation = (startY * canvas.width + startX) * 4;
+        let r = colorLayerData.data[currentPixelLocation];
+        let g = colorLayerData.data[currentPixelLocation + 1];
+        let b = colorLayerData.data[currentPixelLocation + 2];
+        floodFill(startX, startY, r, g, b, color);
+    }
     redraw();
 }
 
@@ -124,6 +157,7 @@ function handleMouseUp(e) {
     endX = undefined;
     endY = undefined;
     console.log(history);
+
 }
 
 function handleMouseMove(e) {
@@ -298,11 +332,11 @@ function handleMouseMove(e) {
     redraw();
 //"animate" the shape that is being drawn
     if (selectedOption === "rectangle") {
-        drawRectangle(startX, startY, endX, endY, color, fill);
+        drawRectangle(context, startX, startY, endX, endY, color, fill);
     } else if (selectedOption === "line") {
-        drawLine(startX, startY, endX, endY, color);
+        drawLine(context, startX, startY, endX, endY, color);
     } else if (selectedOption === "ellipse") {
-        drawEllipse(startX, startY, endX, endY, color, fill);
+        drawEllipse(context, startX, startY, endX, endY, color, fill);
     }
 
 }
@@ -312,7 +346,7 @@ function handleMouseMove(e) {
  * Draw functions
  *
  **/
-function drawRectangle(x, y, toX, toY, color, fill = false) {
+function drawRectangle(context, x, y, toX, toY, color, fill = false) {
     if (!fill) {
         context.strokeStyle = color;
         context.strokeRect(x, y, toX - x, toY - y);
@@ -323,7 +357,7 @@ function drawRectangle(x, y, toX, toY, color, fill = false) {
 
 }
 
-function drawLine(x, y, toX, toY, color) {
+function drawLine(context, x, y, toX, toY, color) {
     context.beginPath();
     context.moveTo(x, y);
     context.lineTo(toX, toY);
@@ -331,7 +365,7 @@ function drawLine(x, y, toX, toY, color) {
     context.stroke();
 }
 
-function drawCircle(x, y, radius, color, fill = false) {
+function drawCircle(context, x, y, radius, color, fill = false) {
     context.beginPath();
     context.arc(x, y, radius, 0, Math.PI * 2, false);
     if (!fill) {
@@ -343,7 +377,7 @@ function drawCircle(x, y, radius, color, fill = false) {
     }
 }
 
-function drawEllipse(x, y, toX, toY, color, fill = false) {
+function drawEllipse(context, x, y, toX, toY, color, fill = false) {
     context.beginPath();
     context.ellipse(x + (toX - x) / 2, y + (toY - y) / 2, Math.abs((toX - x) / 2), Math.abs((toY - y) / 2), 0, 0, Math.PI * 2, false);
     if (!fill) {
@@ -353,6 +387,87 @@ function drawEllipse(x, y, toX, toY, color, fill = false) {
         context.fillStyle = color;
         context.fill();
     }
+}
+
+function floodFill(startX, startY, startR, startG, startB, color) {
+    //don't fill if it is the same color
+    if (rgbOf(color).r === startR && rgbOf(color).g === startG && rgbOf(color).b === startB) {
+        return;
+    }
+    //contains all the colo data of the pixels
+    let colorLayerData = context.getImageData(0, 0, canvas.width, canvas.height);
+    let pixelStack = [[startX, startY]];
+
+    //draw a pixel at pixel position
+    function drawPixel(pixelPos, r, g, b) {
+        colorLayerData.data[pixelPos] = r;
+        colorLayerData.data[pixelPos + 1] = g;
+        colorLayerData.data[pixelPos + 2] = b;
+    }
+
+    //check if the pixel has the starting color
+    function pixelMatchesColor(pixelPos, startR, startG, startB) {
+        let r = colorLayerData.data[pixelPos];
+        let g = colorLayerData.data[pixelPos + 1];
+        let b = colorLayerData.data[pixelPos + 2];
+        return (r === startR && g === startG && b === startB);
+    }
+
+    while (pixelStack.length) {
+        let newPos = pixelStack.pop();
+        let x = newPos[0];
+        let y = newPos[1];
+
+        // Get current pixel position
+        let pixelPos = (y * canvas.width + x) * 4;
+
+        // Go up as long as the color matches and we are inside the canvas
+        while (y >= 0 && pixelMatchesColor(pixelPos, startR, startG, startB)) {
+            y -= 1;
+            pixelPos -= canvas.width * 4;
+        }
+        y += 1;
+        pixelPos += canvas.width * 4;
+
+        let reachLeft = false;
+        let reachRight = false;
+
+        // Go down as long as the color matches and we are inside the canvas
+        while (y <= canvas.height && pixelMatchesColor(pixelPos, startR, startG, startB)) {
+            y += 1;
+
+            drawPixel(pixelPos, rgbOf(color).r, rgbOf(color).g, rgbOf(color).b);
+
+            if (x > 0) {
+                if (pixelMatchesColor(pixelPos - 4, startR, startG, startB)) {
+                    if (!reachLeft) {
+                        // Add pixel to stack
+                        pixelStack.push([x - 1, y]);
+                        reachLeft = true;
+                    }
+                } else if (reachLeft) {
+                    reachLeft = false;
+                }
+            }
+
+            if (x < canvas.width) {
+                if (pixelMatchesColor(pixelPos + 4, startR, startG, startB)) {
+                    if (!reachRight) {
+                        // Add pixel to stack
+                        pixelStack.push([x + 1, y]);
+                        reachRight = true;
+                    }
+                } else if (reachRight) {
+                    reachRight = false;
+                }
+            }
+            pixelPos += canvas.width * 4;
+        }
+    }
+    //update the canvas
+    context.putImageData(colorLayerData, 0, 0);
+    //change the ghost canvas so we are able to redo the filling
+    drawGhost();
 }
 
 /**
@@ -366,55 +481,33 @@ function cursorInShape(x, y, item) {
 
 }
 
+//if the shape has no width and height it is invalid
 function isValidShape(x, y, toX, toY) {
     return Math.abs(toX - x) > 0 && Math.abs(toY - y) > 0;
 
 }
 
+//return the r,g,b values of a hex color
+function rgbOf(color) {
+    let r = parseInt(color.slice(1, 3), 16),
+        g = parseInt(color.slice(3, 5), 16),
+        b = parseInt(color.slice(5, 7), 16);
+    return {r: r, g: g, b: b};
+}
 
 /**
  * Options triggers
  */
-function changeCurrentShape(text) {
+function changeCurrentShape(option) {
+    console.log(option);
+    selectedOption = option;
     if (selectedOption !== "selector") {
         selectedShape = undefined;
         currentHandle = undefined;
         redraw();
     }
-    document.getElementById('current').innerHTML = `Shape : ${text}`;
+    document.getElementById('current').innerHTML = `Shape : ${option}`;
 }
-
-document.getElementById('ellipse').addEventListener('click', () => {
-    selectedOption = "ellipse";
-    changeCurrentShape(selectedOption);
-});
-
-document.getElementById("selector").addEventListener('click', () => {
-    selectedOption = "selector";
-    changeCurrentShape(selectedOption);
-});
-
-document.getElementById("circle").addEventListener("click", () => {
-    selectedOption = "circle";
-    changeCurrentShape(selectedOption);
-});
-
-document.getElementById("line").addEventListener("click", () => {
-    selectedOption = "line";
-    changeCurrentShape(selectedOption);
-});
-document.getElementById('rectangle').addEventListener('click', () => {
-    selectedOption = "rectangle";
-    changeCurrentShape(selectedOption);
-});
-
-document.getElementById('color').addEventListener('change', (e) => {
-    color = document.getElementById('color').value;
-});
-
-document.getElementById('fill').addEventListener('change', (e) => {
-    fill = document.getElementById('fill').checked;
-});
 
 canvas.addEventListener('mousedown', (e) => {
     handleMouseDown(e);
@@ -425,3 +518,12 @@ canvas.addEventListener('mouseup', (e) => {
 canvas.addEventListener('mousemove', (e) => {
     handleMouseMove(e);
 });
+
+/**
+ * Downloads the ghost canvas locally
+ * Used for debugging
+ */
+function asd() {
+    document.getElementById("downloader").download = "image.png";
+    document.getElementById("downloader").href = canvasBack.toDataURL("image/png").replace(/^data:image\/[^;]/, 'data:application/octet-stream');
+}

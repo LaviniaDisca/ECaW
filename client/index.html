@@ -9,22 +9,26 @@
 <div id="options">
     <div id="current"></div>
     <br>
-    <button id="rectangle">Rectangle</button>
+    <button id="rectangle" onclick="changeCurrentShape('rectangle')">Rectangle</button>
     <br>
-    <button id="line">Line</button>
+    <button id="line" onclick="changeCurrentShape('line')">Line</button>
     <br>
-    <button id="circle">Circle</button>
+    <button id="circle" onclick="changeCurrentShape('circle')">Circle</button>
     <br>
-    <button id="ellipse">Ellipse</button>
+    <button id="ellipse" onclick="changeCurrentShape('ellipse')">Ellipse</button>
     <br>
-    <button id="selector">Select</button>
+    <button id="selector" onclick="changeCurrentShape('selector')">Select</button>
+    <br>
+    <button id="floodFill" onclick="changeCurrentShape('fill')">Flood Fill</button>
     <br>
     <label>Fill
-        <input type="checkbox" id="fill">
+        <input type="checkbox" id="fill" onchange="fill=checked">
     </label>
     <br>
     <label for="color">Color</label>
-    <input type="color" value="color" id="color">
+    <input type="color" value="color" id="color" onchange="color=value">
+    <br>
+    <a href="#" id="downloader" onclick="asd()" download="image.png">Download!</a>
 </div>
 <canvas></canvas>
 </body>

@@ -1,5 +1,5 @@
 class Rectangle {
-    constructor(x, y, toX, toY, color,fill) {
+    constructor(x, y, toX, toY, color, fill) {
         this.x = x;
         this.y = y;
         this.toX = toX;
@@ -7,16 +7,22 @@ class Rectangle {
         this.width = toX - x;
         this.height = toY - y;
         this.color = color;
-        this.fill=fill
+        this.fill = fill;
     }
 }
 
 //TODO: Add text
 
-//TODO: Fill
+//todo: add image on canvas
+
+//todo: keyboard shortcuts
 
 //todo : style buttons
 
 //todo: draw history
 
+//todo : extract color?
+
 //todo: save to server
+
+//todo: celebrate when it's over
