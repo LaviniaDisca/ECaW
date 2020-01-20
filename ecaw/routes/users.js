@@ -39,4 +39,23 @@ router.get('/:username/:projectId', function (req, res, next) {
     });
 });
 
+router.get('/', function (req, res, next) {
+    mongoDB.connect(databaseURL.databaseURL, function (err, client) {
+        if (err) throw err;
+        let db = client.db('ecaw');
+        let document = {
+            _id:3,
+            circle: {
+                radius: 50
+            },
+            rect:{
+                width:10
+            }
+        };
+        db.collection('projects').insert(document,function (err, records) {
+            if (err) throw err;
+        })
+    });
+});
+
 module.exports = router;

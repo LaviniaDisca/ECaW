@@ -390,6 +390,16 @@ function drawEllipse(context, x, y, toX, toY, color, fill = false) {
 }
 
 function floodFill(startX, startY, startR, startG, startB, color) {
+    let found = false;
+    history.slice().reverse().forEach((item) => {
+        if (!found && cursorInShape(startX, startY, item)) {
+            item.fill = true;
+            found=true;
+        }
+    });
+    if(found){
+        return;
+    }
     //don't fill if it is the same color
     if (rgbOf(color).r === startR && rgbOf(color).g === startG && rgbOf(color).b === startB) {
         return;
