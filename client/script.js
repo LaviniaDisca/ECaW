@@ -544,8 +544,9 @@ function asd() {
 function save() {
     let req = new XMLHttpRequest();
     //todo: change endpoint and also send the back canvas
-    req.open("POST", "http://localhost:3000/users/asd/2", true);
+    req.open("POST", "http://localhost:3000/projects/6", true);
     req.setRequestHeader('Content-Type', 'application/json');
+    //req.setRequestHeader('Authorization', 'Bearer ' + jwtoken);
     req.onreadystatechange = function () {
         //todo: add the message to front-end
         if (req.readyState === XMLHttpRequest.DONE) {
@@ -576,6 +577,7 @@ function restore() {
                 let serverData = new ServerData();
                 serverData.restore(components);
                 history=serverData.toHistoryArray();
+                console.log(history);
                 redraw();
             } else if (req.status === 401) {
                 console.log("error");

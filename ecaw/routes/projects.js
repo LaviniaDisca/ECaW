@@ -2,9 +2,22 @@ let express = require('express');
 let router = express.Router();
 let mongoDB = require('mongodb').MongoClient;
 const databaseURL = require('../app');
+let jwtChecker = require('../jwt');
 
+//all projects owned by the user provided in the JWT
+router.get('/', jwtChecker.verifyToken, jwtChecker.validateToken, function (req, res, next) {
+    mongoDB.connect(databaseURL.databaseURL, function (err, client) {
+        if (err) throw err;
+        let db = client.db('ecaw');
 
-//returns the project details for the user(username) with the specified id(projectId)
+        db.collection('projects').find({username: req.decoded.username}).toArray(function (err, result) {
+            if (err) throw err;
+            res.send(result);
+        })
+    });
+});
+
+//returns the project with id projectId (no token needed here because the cards can be shared without the need of authentication)
 router.get('/:projectId', function (req, res) {
     mongoDB.connect(databaseURL.databaseURL, function (err, client) {
         if (err) throw err;
@@ -15,62 +28,57 @@ router.get('/:projectId', function (req, res) {
         }, function (err, result) {
             if (err) throw err;
             if (result) {
-                result.found = true;
                 res.send(result);
-                console.log(result);
             } else {
-                res.send("Empty")
+                res.status(404).send({
+                   success:false,
+                   message:"Project not found"
+                });
             }
         })
     });
 });
 
 //updates the project
-router.post('/:username/:projectId', function (req, res) {
+router.post('/:projectId', jwtChecker.verifyToken, jwtChecker.validateToken, function (req, res) {
     mongoDB.connect(databaseURL.databaseURL, function (err, client) {
         if (err) throw err;
         let db = client.db('ecaw');
-        console.log(req.body._id);
+
         db.collection('projects').findOne({
-            _id: parseInt(req.body._id)
+            _id: parseInt(req.params.projectId)
         }, function (err, result) {
             if (err) throw err;
             if (result) {
-                //if the project exists, overwrite it
-                db.collection('projects').replaceOne(
-                    {_id: parseInt(req.body._id)},
-                    req.body, {upsert: true}
-                );
+                if (result.username !== req.decoded.username) {
+                    res.status(401).send({
+                        success: false,
+                        message: "You do not own this project"
+                    })
+                } else {
+                    //if the project exists, overwrite it
+                    db.collection('projects').replaceOne(
+                        {_id: parseInt(req.body._id)},
+                        req.body, {upsert: true}
+                    );
+                    res.send({
+                        success: true,
+                        message: "Card saved"
+                    })
+                }
             } else {
                 //if it doesn't add it to the database
                 db.collection('projects').insert(req.body, function (err) {
                     if (err) throw err;
                     else console.log("updated");
                 });
+                res.send({
+                    success: true,
+                    message: "Card saved"
+                })
             }
         });
-
-        res.send(JSON.stringify({success: true}))
     });
 });
-//
-// router.get('/', function (req, res, next) {
-//     mongoDB.connect(databaseURL.databaseURL, function (err, client) {
-//         if (err) throw err;
-//         let db = client.db('ecaw');
-//         let document = {
-//             _id: 3,
-//             circle: {
-//                 radius: 50
-//             },
-//             rect: {
-//                 width: 10
-//             }
-//         };
-//         db.collection('projects').insert(document, function (err, records) {
-//             if (err) throw err;
-//         })
-//     });
-// });
 
 module.exports = router;

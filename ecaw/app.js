@@ -10,8 +10,8 @@ let projectsRouter = require('./routes/projects');
 
 let app = express();
 
-app.use(cors());
 
+app.use(cors());
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
@@ -38,7 +38,10 @@ app.use(function(err, req, res, next) {
 
   // render the error page
   res.status(err.status || 500);
-  res.render('error');
+  res.send({
+    success:false,
+    message:"No such endpoint"
+  })
 });
 
 module.exports = app;
