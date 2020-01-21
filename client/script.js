@@ -394,10 +394,10 @@ function floodFill(startX, startY, startR, startG, startB, color) {
     history.slice().reverse().forEach((item) => {
         if (!found && cursorInShape(startX, startY, item)) {
             item.fill = true;
-            found=true;
+            found = true;
         }
     });
-    if(found){
+    if (found) {
         return;
     }
     //don't fill if it is the same color
@@ -536,4 +536,56 @@ canvas.addEventListener('mousemove', (e) => {
 function asd() {
     document.getElementById("downloader").download = "image.png";
     document.getElementById("downloader").href = canvasBack.toDataURL("image/png").replace(/^data:image\/[^;]/, 'data:application/octet-stream');
+}
+
+/**
+ * This will send the necessary data to the server
+ */
+function save() {
+    let req = new XMLHttpRequest();
+    //todo: change endpoint and also send the back canvas
+    req.open("POST", "http://localhost:3000/users/asd/2", true);
+    req.setRequestHeader('Content-Type', 'application/json');
+    req.onreadystatechange = function () {
+        //todo: add the message to front-end
+        if (req.readyState === XMLHttpRequest.DONE) {
+            if (req.status === 200) {
+                console.log("Request sent successfully");
+            } else if (req.status === 401) {
+                console.log("error");
+            }
+        }
+    };
+    req.send(JSON.stringify(new ServerData(history, "asd", 6)));
+}
+
+/**
+ * This will retrieve the data of the project from the server if it exists
+ */
+function restore() {
+    let req = new XMLHttpRequest();
+    //todo: change endpoint
+    req.open("GET", "http://localhost:3000/projects/6", true);
+    req.setRequestHeader('Content-Type', 'application/json');
+    req.onreadystatechange = function () {
+        //todo: add the message to front-end
+        if (req.readyState === XMLHttpRequest.DONE) {
+            if (req.status === 200) {
+                console.log("data retrieved successfully");
+                let components = JSON.parse(req.responseText);
+                let serverData = new ServerData();
+                serverData.restore(components);
+                history=serverData.toHistoryArray();
+                redraw();
+            } else if (req.status === 401) {
+                console.log("error");
+            }
+        }
+    };
+    req.send(JSON.stringify({_id: 6, username: "asd"}))
+}
+
+function test() {
+    let components = new ServerData(history);
+    console.log(components.toHistoryArray());
 }

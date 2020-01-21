@@ -3,18 +3,25 @@ let router = express.Router();
 let mongoDB = require('mongodb').MongoClient;
 const databaseURL = require('../app');
 
-//all projects owned by user(username)
-router.get('/:username', function (req, res, next) {
-    console.log(databaseURL);
+
+//returns the project details for the user(username) with the specified id(projectId)
+router.get('/:projectId', function (req, res) {
     mongoDB.connect(databaseURL.databaseURL, function (err, client) {
         if (err) throw err;
         let db = client.db('ecaw');
 
-        db.collection('projects').find({username: req.params.username}).toArray(function (err, result) {
+        db.collection('projects').findOne({
+            _id: parseInt(req.params.projectId)
+        }, function (err, result) {
             if (err) throw err;
-            res.send(result);
+            if (result) {
+                result.found = true;
+                res.send(result);
+                console.log(result);
+            } else {
+                res.send("Empty")
+            }
         })
-
     });
 });
 
@@ -36,7 +43,7 @@ router.post('/:username/:projectId', function (req, res) {
                 );
             } else {
                 //if it doesn't add it to the database
-                db.collection('projects').insert(req.body,function (err) {
+                db.collection('projects').insert(req.body, function (err) {
                     if (err) throw err;
                     else console.log("updated");
                 });
