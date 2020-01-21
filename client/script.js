@@ -346,6 +346,78 @@ function handleMouseMove(e) {
  * Draw functions
  *
  **/
+let startingX = 0;
+let mouseX = 0;
+let mouseY = 0;
+
+//Stores every word
+let recentWords = [];
+
+
+//Array for backspace
+let undoList = [];
+
+document.getElementById('text').addEventListener('click', (ev) => {
+
+//Save state after every key press
+    function saveState() {
+        undoList.push(canvas.toDataURL());
+    }
+
+    saveState();
+
+    function undo() {
+        undoList.pop();
+
+        let imgData = undoList[undoList.length - 1];
+        let image = new Image();
+
+        //Display old saved state
+        image.src = imgData;
+        image.onload = function () {
+            context.clearRect(0, 0, canvas.width, canvas.height);
+            context.drawImage(image, 0, 0, canvas.width, canvas.height, 0, 0, canvas.width, canvas.height);
+        }
+    }
+
+    canvas.addEventListener('click', (e) => {
+        mouseX = e.pageX - canvas.offsetLeft;
+        mouseY = e.pageY - canvas.offsetTop;
+        startingX = mouseX;
+
+        recentWords = [];
+    });
+
+    document.addEventListener('keydown', (ev) => {
+        context.font = '16px Arial';
+
+        if (ev.key === 'Backspace') {
+            undo();
+
+            //Remove recent word
+            let recentWord = recentWords[recentWords.length - 1];
+
+            mouseX -= context.measureText(recentWord).width;
+
+            recentWords.pop();
+        } else if (ev.key === 'Enter') {
+            // Press Enter
+            mouseX = startingX;
+            mouseY += 20; //The size of the font + 4
+        } else {
+            context.fillText(ev.key, mouseX, mouseY);
+
+            //Move cursor after every character
+            mouseX += context.measureText(ev.key).width;
+
+            saveState();
+            recentWords.push(ev.key);
+        }
+
+    });
+
+});
+
 function drawRectangle(context, x, y, toX, toY, color, fill = false) {
     if (!fill) {
         context.strokeStyle = color;
@@ -575,7 +647,7 @@ function restore() {
                 let components = JSON.parse(req.responseText);
                 let serverData = new ServerData();
                 serverData.restore(components);
-                history=serverData.toHistoryArray();
+                history = serverData.toHistoryArray();
                 redraw();
             } else if (req.status === 401) {
                 console.log("error");
