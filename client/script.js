@@ -2,6 +2,9 @@ let canvas = document.querySelector('canvas');
 let selectedOption;
 let color = "#000000";
 let history = [];
+//Stores every word
+let recentWords = [];
+
 let selectedShape = undefined;
 let currentHandle = undefined;
 let fill = false;
@@ -106,6 +109,10 @@ function handleMouseDown(e) {
     startX = e.offsetX;
     startY = e.offsetY;
     isDown = true;
+    if (selectedShape === "text") {
+        recentWords = [];
+        startingX = e.offsetX;
+    }
     if (selectedOption === "selector") {
         // if the mouse is over a handle don't try to search for another shape
         if (typeof currentHandle !== "undefined") {
@@ -347,75 +354,59 @@ function handleMouseMove(e) {
  *
  **/
 let startingX = 0;
-let mouseX = 0;
-let mouseY = 0;
-
-//Stores every word
-let recentWords = [];
-
 
 //Array for backspace
 let undoList = [];
 
-document.getElementById('text').addEventListener('click', (ev) => {
+function undo() {
+    undoList.pop();
 
-//Save state after every key press
-    function saveState() {
-        undoList.push(canvas.toDataURL());
+    let imgData = undoList[undoList.length - 1];
+    let image = new Image();
+
+    //Display old saved state
+    image.src = imgData;
+    image.onload = function () {
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        context.drawImage(image, 0, 0, canvas.width, canvas.height, 0, 0, canvas.width, canvas.height);
     }
+}
 
-    saveState();
+function saveState() {
+    undoList.push(canvas.toDataURL());
+}
 
-    function undo() {
-        undoList.pop();
-
-        let imgData = undoList[undoList.length - 1];
-        let image = new Image();
-
-        //Display old saved state
-        image.src = imgData;
-        image.onload = function () {
-            context.clearRect(0, 0, canvas.width, canvas.height);
-            context.drawImage(image, 0, 0, canvas.width, canvas.height, 0, 0, canvas.width, canvas.height);
-        }
+document.addEventListener('keydown', (ev) => {
+    if (selectedOption !== "text") {
+        return;
     }
+    ev.preventDefault();
+    context.font = '16px Arial';
 
-    canvas.addEventListener('click', (e) => {
-        mouseX = e.pageX - canvas.offsetLeft;
-        mouseY = e.pageY - canvas.offsetTop;
-        startingX = mouseX;
+    if (ev.key === 'Backspace') {
+        undo();
 
-        recentWords = [];
-    });
+        //Remove recent word
+        let recentWord = recentWords[recentWords.length - 1];
 
-    document.addEventListener('keydown', (ev) => {
-        context.font = '16px Arial';
+        startX -= context.measureText(recentWord).width;
 
-        if (ev.key === 'Backspace') {
-            undo();
+        recentWords.pop();
+    } else if (ev.key === 'Enter') {
+        // Press Enter
+        startX = startingX;
+        startY += 20; //The size of the font + 4
+    } else {
+        context.fillStyle = color;
+        context.fillText(ev.key, startX, startY);
+        context.fill();
 
-            //Remove recent word
-            let recentWord = recentWords[recentWords.length - 1];
+        //Move cursor after every character
+        startX += context.measureText(ev.key).width;
 
-            mouseX -= context.measureText(recentWord).width;
-
-            recentWords.pop();
-        } else if (ev.key === 'Enter') {
-            // Press Enter
-            mouseX = startingX;
-            mouseY += 20; //The size of the font + 4
-        } else {
-            context.fillText(ev.key, mouseX, mouseY);
-
-            //Move cursor after every character
-            mouseX += context.measureText(ev.key).width;
-
-            saveState();
-            recentWords.push(ev.key);
-        }
-
-    });
-
+        saveState();
+        recentWords.push(ev.key);
+    }
 });
 
 function drawRectangle(context, x, y, toX, toY, color, fill = false) {
@@ -583,6 +574,8 @@ function rgbOf(color) {
 function changeCurrentShape(option) {
     console.log(option);
     selectedOption = option;
+    startX = undefined;
+    startY = undefined;
     if (selectedOption !== "selector") {
         selectedShape = undefined;
         currentHandle = undefined;
