@@ -7,7 +7,7 @@
 </head>
 <body>
 <div id="options">
-    <div id="current"></div>
+    <div id="current" class="choice"></div>
     <br>
     <button id="rectangle" onclick="changeCurrentShape('rectangle')">Rectangle</button>
     <br>
@@ -23,20 +23,22 @@
     <br>
     <button id="floodFill" onclick="changeCurrentShape('fill')">Flood Fill</button>
     <br>
-    <label>Fill
-        <input type="checkbox" id="fill" onchange="fill=checked">
-    </label>
-    <br>
-    <label for="color">Color</label>
-    <input type="color" value="color" id="color" onchange="color=value">
-    <br>
-    <a href="#" id="downloader" onclick="asd()" download="image.png">Download!</a>
-    <br>
     <button id="saveBtn" onclick="save()">Save</button>
     <br>
     <button id="restoreBtn" onclick="restore()">Restore</button>
     <br>
     <button id="testbtn" onclick="test()">TEST</button>
+    <br>
+    <label class="container">
+        Fill
+        <input type="checkbox" class="option-input checkbox"  id="fill" onchange="fill=checked">
+    </label>
+    <br>
+    <label class="col" for="color">Color</label>
+    <input type="color" value="color" id="color" onchange="color=value">
+    <br>
+    <a class="buttonDownload" href="#" id="downloader" onclick="asd()" download="image.png">Download!</a>
+    <br>
 </div>
 <canvas></canvas>
 </body>
@@ -46,5 +48,6 @@
 <script src="Models/Ellipse.js"></script>
 <script src="Models/Line.js"></script>
 <script src="Models/Rectangle.js"></script>
+<script src="Models/Text.js"></script>
 <script src="script.js"></script>
 </html>

@@ -4,11 +4,12 @@ let color = "#000000";
 let history = [];
 //Stores every word
 let recentWords = [];
-
+let startingX = 0;
 let selectedShape = undefined;
 let currentHandle = undefined;
 let fill = false;
 let selectedItem = undefined;
+let enterCoords = [];
 
 /**
  *  Sets the initial canvas height and width
@@ -42,6 +43,8 @@ function redraw() {
             drawEllipse(context, history[i].x, history[i].y, history[i].toX, history[i].toY, history[i].color, history[i].fill);
         } else if (history[i] instanceof Circle) {
             drawCircle(context, history[i].centerX, history[i].centerY, history[i].radius, history[i].color, history[i].fill);
+        } else if (history[i] instanceof TextInput) {
+            drawText(context, history[i].startingX, history[i].startY, history[i].words, history[i].enterCoords);
         }
     }
     // Draw the selection rect if there's one
@@ -62,6 +65,8 @@ function drawGhost() {
             drawEllipse(ghostContext, history[i].x, history[i].y, history[i].toX, history[i].toY, "#ffffff", history[i].fill);
         } else if (history[i] instanceof Circle) {
             drawCircle(ghostContext, history[i].centerX, history[i].centerY, history[i].radius, "#ffffff", history[i].fill);
+        } else if (history[i] instanceof TextInput) {
+            drawText(ghostContext, history[i].startingX, history[i].startY, history[i].words, history[i].enterCoords);
         }
     }
 }
@@ -109,7 +114,7 @@ function handleMouseDown(e) {
     startX = e.offsetX;
     startY = e.offsetY;
     isDown = true;
-    if (selectedShape === "text") {
+    if (selectedOption === 'text') {
         recentWords = [];
         startingX = e.offsetX;
     }
@@ -156,6 +161,8 @@ function handleMouseUp(e) {
             history.push(new Line(startX, startY, endX, endY, color));
         } else if (selectedOption === "ellipse" && endX !== undefined) {
             history.push(new Ellipse(startX, startY, endX, endY, color, fill));
+        } else if (selectedOption === 'text') {
+            history.push(new TextInput(startingX, startY, recentWords, enterCoords));
         } else if (selectedOption === "circle" && endX !== undefined) {
             history.push(new Circle(startX, startY, 50, color, fill));
             redraw();
@@ -353,7 +360,6 @@ function handleMouseMove(e) {
  * Draw functions
  *
  **/
-let startingX = 0;
 
 //Array for backspace
 let undoList = [];
@@ -394,6 +400,7 @@ document.addEventListener('keydown', (ev) => {
         recentWords.pop();
     } else if (ev.key === 'Enter') {
         // Press Enter
+        enterCoords.push(startX);
         startX = startingX;
         startY += 20; //The size of the font + 4
     } else {
@@ -403,11 +410,18 @@ document.addEventListener('keydown', (ev) => {
 
         //Move cursor after every character
         startX += context.measureText(ev.key).width;
-
         saveState();
         recentWords.push(ev.key);
     }
 });
+
+function drawText(ctx, initX, initY, words, enters) {
+    ctx = context;
+    initX = startingX;
+    initY = startY;
+    words = recentWords;
+    enters = enterCoords;
+}
 
 function drawRectangle(context, x, y, toX, toY, color, fill = false) {
     if (!fill) {
