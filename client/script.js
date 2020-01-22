@@ -560,23 +560,47 @@ function save() {
     req.send(JSON.stringify(new ServerData(history, "asd", 6)));
 }
 
+let token;
+
+function test() {
+    let req = new XMLHttpRequest();
+    //todo: change endpoint
+    req.open("POST", "http://localhost:3000/users/auth", true);
+    req.setRequestHeader('Content-Type', 'application/json');
+    req.onreadystatechange = function () {
+        if (req.readyState === XMLHttpRequest.DONE) {
+            if (req.status === 200) {
+                let result = JSON.parse(req.responseText);
+                if (result.success) {
+                    token = result.token;
+                } else {
+                    //todo:show error message
+                    console.log("Login failed");
+                }
+            } else if (req.status === 401) {
+                console.log("error");
+            }
+        }
+    };
+    req.send(JSON.stringify({username: "admin", password: "password"}))
+}
+
 /**
  * This will retrieve the data of the project from the server if it exists
  */
 function restore() {
     let req = new XMLHttpRequest();
-    //todo: change endpoint
     req.open("GET", "http://localhost:3000/projects/6", true);
     req.setRequestHeader('Content-Type', 'application/json');
+    //req.setRequestHeader('Authorization', 'Bearer ' + token);
     req.onreadystatechange = function () {
-        //todo: add the message to front-end
         if (req.readyState === XMLHttpRequest.DONE) {
             if (req.status === 200) {
-                console.log("data retrieved successfully");
                 let components = JSON.parse(req.responseText);
                 let serverData = new ServerData();
                 serverData.restore(components);
-                history=serverData.toHistoryArray();
+                console.log(serverData);
+                history = serverData.toHistoryArray();
                 console.log(history);
                 redraw();
             } else if (req.status === 401) {
@@ -584,10 +608,5 @@ function restore() {
             }
         }
     };
-    req.send(JSON.stringify({_id: 6, username: "asd"}))
-}
-
-function test() {
-    let components = new ServerData(history);
-    console.log(components.toHistoryArray());
+    req.send(JSON.stringify({username: "admin", password: "password"}))
 }
