@@ -27,7 +27,7 @@ class ServerData {
     toHistoryArray() {
         let history = [];
         this.circles.forEach((item) => {
-            history[item.index] = new Circle(item.x, item.y, item.radius, item.color, item.fill);
+            history[item.index] = new Circle(item.centerX, item.centerY, item.radius, item.color, item.fill);
         });
         this.ellipses.forEach((item) => {
             history[item.index] = new Ellipse(item.x, item.y, item.toX, item.toY, item.color, item.fill);

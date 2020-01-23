@@ -1,69 +1,105 @@
 let express = require('express');
 let router = express.Router();
 let mongoDB = require('mongodb').MongoClient;
+let jwt = require('jsonwebtoken');
+let config = require("../config");
 const databaseURL = require('../app');
 
-//all projects owned by user(username)
-router.get('/:username', function (req, res, next) {
-    console.log(databaseURL);
-    mongoDB.connect(databaseURL.databaseURL, function (err, client) {
-        if (err) throw err;
-        let db = client.db('ecaw');
-
-        db.collection('projects').find({username: req.params.username}).toArray(function (err, result) {
+let validateUser = function (req, res, next) {
+    let user = req.body.username;
+    let password = req.body.password;
+    if (user && password) {
+        mongoDB.connect(databaseURL.databaseURL, function (err, client) {
             if (err) throw err;
-            res.send(result);
-        })
-
-    });
-});
-
-//updates the project
-router.post('/:username/:projectId', function (req, res) {
-    mongoDB.connect(databaseURL.databaseURL, function (err, client) {
-        if (err) throw err;
-        let db = client.db('ecaw');
-        console.log(req.body._id);
-        db.collection('projects').findOne({
-            _id: parseInt(req.body._id)
-        }, function (err, result) {
-            if (err) throw err;
-            if (result) {
-                //if the project exists, overwrite it
-                db.collection('projects').replaceOne(
-                    {_id: parseInt(req.body._id)},
-                    req.body, {upsert: true}
-                );
-            } else {
-                //if it doesn't add it to the database
-                db.collection('projects').insert(req.body,function (err) {
+            let db = client.db('ecaw');
+            db.collection('users').findOne({username: user},
+                function (err, result) {
                     if (err) throw err;
-                    else console.log("updated");
-                });
-            }
+                    //user found, check password
+                    if (result) {
+                        if (result.password === password) {
+                            let token = jwt.sign({username: user},
+                                config.secret
+                            );
+                            res.send({
+                                success: true,
+                                message: "Login successful",
+                                token: token
+                            });
+                            req.token = token;
+                            next();
+                        } else {
+                            res.status(401).send({
+                                success: false,
+                                message: "Incorrect password"
+                            })
+                        }
+                    } else {
+                        res.status(404).send({
+                            success: false,
+                            message: "The username is not valid"
+                        })
+                    }
+                }
+            )
         });
+    } else {
+        res.status(400).send({
+            success: false,
+            message: "Username and password have to be defined"
+        })
+    }
+};
 
-        res.send(JSON.stringify({success: true}))
+let updateToken = function (req) {
+    mongoDB.connect(databaseURL.databaseURL, function (err, client) {
+        if (err) throw err;
+        let db = client.db('ecaw');
+        db.collection('users').updateOne(
+            {username: req.body.username},
+            {$set: {jwt: req.token}},
+            {upsert: true});
     });
-});
-//
-// router.get('/', function (req, res, next) {
-//     mongoDB.connect(databaseURL.databaseURL, function (err, client) {
-//         if (err) throw err;
-//         let db = client.db('ecaw');
-//         let document = {
-//             _id: 3,
-//             circle: {
-//                 radius: 50
-//             },
-//             rect: {
-//                 width: 10
-//             }
-//         };
-//         db.collection('projects').insert(document, function (err, records) {
-//             if (err) throw err;
-//         })
-//     });
-// });
+};
+
+let register = function (req, res) {
+    let user = req.body.username;
+    let password = req.body.password;
+
+    if (user && password) {
+        mongoDB.connect(databaseURL.databaseURL, function (err, client) {
+            if (err) throw err;
+            let db = client.db('ecaw');
+            db.collection('users').findOne({username: user}, function (err, result) {
+                if (err) throw err;
+                if (result) {
+                    res.status(409).send({
+                        success: false,
+                        message: "Username already taken"
+                    })
+                } else {
+                    db.collection('users').insert({
+                        username: user,
+                        password: password
+                    }, function (err) {
+                        if (err) throw err;
+                        res.send({
+                            success: true,
+                            message: "User successfully created"
+                        })
+                    });
+                }
+            })
+        });
+    } else {
+        res.status(400).send({
+            success: false,
+            message: "Username and password have to be defined"
+        })
+    }
+};
+
+router.post('/auth', validateUser, updateToken);
+router.post('/register', register);
 
 module.exports = router;

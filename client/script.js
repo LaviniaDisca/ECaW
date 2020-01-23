@@ -273,13 +273,13 @@ function handleMouseMove(e) {
         selectedShape.updateHandles();
     }
 
-//Get the handle over which the mouse is over and the cursor style
+    //Get the handle over which the mouse is over and the cursor style
     else if (typeof selectedShape !== "undefined") {
         currentHandle = undefined;
         for (let i = 0; i < 8; i++) {
             let handle = selectedShape.selectionHandles[i];
-            if (handle.x <= e.offsetX && e.offsetX <= handle.x + selectedShape.handleSize
-                && handle.y <= e.offsetY && e.offsetY <= handle.y + selectedShape.handleSize) {
+            if (handle.x <= e.offsetX && e.offsetX <= handle.x + selectedShape.handleSize &&
+                handle.y <= e.offsetY && e.offsetY <= handle.y + selectedShape.handleSize) {
                 currentHandle = i;
             }
         }
@@ -344,7 +344,7 @@ function handleMouseMove(e) {
     }
 
     redraw();
-//"animate" the shape that is being drawn
+    //"animate" the shape that is being drawn
     if (selectedOption === "rectangle") {
         drawRectangle(context, startX, startY, endX, endY, color, fill);
     } else if (selectedOption === "line") {
@@ -372,7 +372,7 @@ function undo() {
 
     //Display old saved state
     image.src = imgData;
-    image.onload = function () {
+    image.onload = function() {
         context.clearRect(0, 0, canvas.width, canvas.height);
         context.drawImage(image, 0, 0, canvas.width, canvas.height, 0, 0, canvas.width, canvas.height);
     }
@@ -483,7 +483,9 @@ function floodFill(startX, startY, startR, startG, startB, color) {
     }
     //contains all the colo data of the pixels
     let colorLayerData = context.getImageData(0, 0, canvas.width, canvas.height);
-    let pixelStack = [[startX, startY]];
+    let pixelStack = [
+        [startX, startY]
+    ];
 
     //draw a pixel at pixel position
     function drawPixel(pixelPos, r, g, b) {
@@ -579,7 +581,7 @@ function rgbOf(color) {
     let r = parseInt(color.slice(1, 3), 16),
         g = parseInt(color.slice(3, 5), 16),
         b = parseInt(color.slice(5, 7), 16);
-    return {r: r, g: g, b: b};
+    return { r: r, g: g, b: b };
 }
 
 /**
@@ -623,9 +625,10 @@ function asd() {
 function save() {
     let req = new XMLHttpRequest();
     //todo: change endpoint and also send the back canvas
-    req.open("POST", "http://localhost:3000/users/asd/2", true);
+    req.open("POST", "http://localhost:3000/projects/6", true);
     req.setRequestHeader('Content-Type', 'application/json');
-    req.onreadystatechange = function () {
+    //req.setRequestHeader('Authorization', 'Bearer ' + jwtoken);
+    req.onreadystatechange = function() {
         //todo: add the message to front-end
         if (req.readyState === XMLHttpRequest.DONE) {
             if (req.status === 200) {
@@ -638,33 +641,53 @@ function save() {
     req.send(JSON.stringify(new ServerData(history, "asd", 6)));
 }
 
+let token;
+
+function test() {
+    let req = new XMLHttpRequest();
+    //todo: change endpoint
+    req.open("POST", "http://localhost:3000/users/auth", true);
+    req.setRequestHeader('Content-Type', 'application/json');
+    req.onreadystatechange = function() {
+        if (req.readyState === XMLHttpRequest.DONE) {
+            if (req.status === 200) {
+                let result = JSON.parse(req.responseText);
+                if (result.success) {
+                    token = result.token;
+                } else {
+                    //todo:show error message
+                    console.log("Login failed");
+                }
+            } else if (req.status === 401) {
+                console.log("error");
+            }
+        }
+    };
+    req.send(JSON.stringify({ username: "admin", password: "password" }))
+}
+
 /**
  * This will retrieve the data of the project from the server if it exists
  */
 function restore() {
     let req = new XMLHttpRequest();
-    //todo: change endpoint
     req.open("GET", "http://localhost:3000/projects/6", true);
     req.setRequestHeader('Content-Type', 'application/json');
-    req.onreadystatechange = function () {
-        //todo: add the message to front-end
+    //req.setRequestHeader('Authorization', 'Bearer ' + token);
+    req.onreadystatechange = function() {
         if (req.readyState === XMLHttpRequest.DONE) {
             if (req.status === 200) {
-                console.log("data retrieved successfully");
                 let components = JSON.parse(req.responseText);
                 let serverData = new ServerData();
                 serverData.restore(components);
+                console.log(serverData);
                 history = serverData.toHistoryArray();
+                console.log(history);
                 redraw();
             } else if (req.status === 401) {
                 console.log("error");
             }
         }
     };
-    req.send(JSON.stringify({_id: 6, username: "asd"}))
-}
-
-function test() {
-    let components = new ServerData(history);
-    console.log(components.toHistoryArray());
+    req.send(JSON.stringify({ username: "admin", password: "password" }))
 }

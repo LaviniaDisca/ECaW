@@ -1,8 +1,8 @@
 class Circle {
-    constructor(x, y, radius, color, fill) {
+    constructor(centerX, centerY, radius, color, fill) {
         this.radius = radius;
-        this.centerX = x;
-        this.centerY = y;
+        this.centerX = centerX;
+        this.centerY = centerY;
         this.color = color;
         this.fill = fill;
         this.x = this.centerX - this.radius;
