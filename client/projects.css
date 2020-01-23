@@ -1,0 +1,208 @@
+html, body, div, span, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, abbr, address, cite, code, del, dfn, em, img, ins, kbd, q, samp, small, strong, sub, sup, var, b, i, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, canvas, details, figcaption, figure, footer, header, hgroup, menu, nav, section, summary, time, mark, audio, video {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    outline: 0;
+    font-size: 100%;
+    vertical-align: baseline;
+    background: transparent;
+}
+
+nav ul {
+    list-style: none;
+}
+
+* {
+    text-decoration: none;
+}
+
+header {
+    font-family: Arial;
+    color: white;
+}
+
+nav {
+    z-index: 9999;
+    position: relative;
+}
+
+ul li {
+    float: left;
+    height: 2em;
+    width: calc(20% - 2px);
+    background-color: rgba(0, 0, 0, 0.5);
+    line-height: 2em;
+    text-align: center;
+    margin-right: 2px;
+}
+
+@media only screen and (min-width: 900px) {
+    ul li {
+        font-size: calc(7px + 1vw);
+    }
+    .title {
+        font-size: calc(12px + 2vw);
+    }
+    .catalog {
+        font-size: calc(7px + 1vw);
+    }
+    .product {
+        width: calc(240px + 5vw);
+    }
+    .product img {
+        width: 100%;
+        height: calc(160px + 5vw);
+    }
+}
+
+@media only screen and (min-width: 600px) and (max-width: 900px) {
+    ul li {
+        font-size: calc(10px + 1vw);
+    }
+    .title {
+        font-size: calc(12px + 2vw);
+    }
+    .catalog {
+        font-size: calc(10px + 1vw);
+    }
+    .product {
+        width: 240px;
+    }
+    .product img {
+        width: 100%;
+        height: 160px;
+    }
+}
+
+@media only screen and (max-width: 599px) {
+    .nav-option {
+        display: none;
+    }
+    ul li {
+        line-height: 3em;
+        height: 3em;
+        font-size: calc(18px + 2vw);
+    }
+    .title {
+        font-size: calc(15px + 2vw);
+    }
+    .catalog {
+        font-size: calc(15px + 2vw);
+    }
+    .product {
+        width: 210px;
+    }
+    .product img {
+        width: 100%;
+        height: 140px;
+    }
+}
+
+ul li a {
+    color: white;
+    display: block;
+    user-select: none;
+}
+
+ul li a:hover {
+    background-color: white;
+    color: black;
+}
+
+.logo:hover {
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+}
+
+ul li ul li {
+    display: none;
+    width: 100%;
+}
+
+ul li:hover ul li {
+    display: block;
+}
+
+body {
+    background-image: url('back.png');
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+.title {
+    color: #37987A;
+    text-align: center;
+    height: 2em;
+    line-height: 3em;
+    padding: 1em;
+    font-family: 'Snell Roundhand', cursive;
+    font-style: italic;
+}
+
+.catalog {
+    float: left;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    position: relative;
+    z-index: 1000;
+    margin-bottom:2em;
+}
+
+.product {
+    padding: 10px;
+    border: 3px solid rgba(255, 255, 255, 0.9);
+    border-radius: 5px;
+    background-color: rgba(0, 0, 0, 0.5);
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+    text-align: center;
+    /*Font to be changed*/
+    font-family: Arial;
+    margin-top: 2em;
+    margin-left: 1em;
+    margin-right: 1em;
+}
+
+.product:hover {
+    transform: scale(calc(1.1));
+    background-color: rgba(0, 0, 0, 0.9);
+}
+
+.product .price {
+    color: #37987A;
+    padding: 2px;
+}
+
+.product h1 {
+    padding: 2px;
+    color: white;
+}
+
+.product .button {
+    padding: 2px;
+}
+
+.button {
+    text-align: center;
+    display: inline-block;
+    font-size: 1em;
+    margin-top: 10px;
+    cursor: pointer;
+    background-color: #37987A;
+    color: black;
+    border: 3px solid #37987A;
+    border-radius: 10px;
+    padding: 20px;
+}
+
+.button .button-text {
+    padding: 4px;
+}
+
+.button:hover {
+    background-color: green;
+}
+
+.button:hover .button-text {
+    color: white;
+}
