@@ -1,6 +1,46 @@
 doctype html
 head
     meta(charset='UTF-8')
-    title Title
-h1 TO BE REPLACED WITH ACTUAL HOMEPAGE
+    title Canvas
+    link(rel='stylesheet' type='text/css' href='stylesheets/home.css')
+#options
+    #current.choice
+    br
+    button#rectangle(onclick="changeCurrentShape('rectangle')") Rectangle
+    br
+    button#line(onclick="changeCurrentShape('line')") Line
+    br
+    button#circle(onclick="changeCurrentShape('circle')") Circle
+    br
+    button#ellipse(onclick="changeCurrentShape('ellipse')") Ellipse
+    br
+    button#text(onclick="changeCurrentShape('text')") Add Text
+    br
+    button#selector(onclick="changeCurrentShape('selector')") Select
+    br
+    button#floodFill(onclick="changeCurrentShape('fill')") Flood Fill
+    br
+    button#saveBtn(onclick='save()') Save
+    br
+    button#restoreBtn(onclick='restore()') Restore
+    br
+    button#testbtn(onclick='test()') TEST
+    br
+    label.container
+        | Fill
+        input#fill.option-input.checkbox(type='checkbox' onchange='fill=checked')
+    br
+    label.col(for='color') Color
+    input#color(type='color' value='color' onchange='color=value')
+    br
+    a#downloader.buttonDownload(href='#' onclick='asd()' download='image.png') Download!
+    br
+canvas
+script(src='javascripts/Models/Circle.js')
+script(src='javascripts/Models/ServerData.js')
+script(src='javascripts/Models/SelectRect.js')
+script(src='javascripts/Models/Ellipse.js')
+script(src='javascripts/Models/Line.js')
+script(src='javascripts/Models/Rectangle.js')
+script(src='javascripts/Models/Text.js')
 script(src='javascripts/home.js')

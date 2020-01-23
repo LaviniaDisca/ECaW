@@ -671,19 +671,14 @@ function test() {
  */
 function restore() {
     let req = new XMLHttpRequest();
-    req.open("GET", "http://localhost:3000/projects/6", true);
+    req.open("GET", "http://localhost:3000/projects", true);
     req.setRequestHeader('Content-Type', 'application/json');
-    //req.setRequestHeader('Authorization', 'Bearer ' + token);
+    req.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('ecaw-jwt'));
     req.onreadystatechange = function() {
         if (req.readyState === XMLHttpRequest.DONE) {
             if (req.status === 200) {
                 let components = JSON.parse(req.responseText);
-                let serverData = new ServerData();
-                serverData.restore(components);
-                console.log(serverData);
-                history = serverData.toHistoryArray();
-                console.log(history);
-                redraw();
+                console.log(components);
             } else if (req.status === 401) {
                 console.log("error");
             }
