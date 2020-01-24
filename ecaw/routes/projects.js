@@ -3,6 +3,17 @@ let router = express.Router();
 let mongoDB = require('mongodb').MongoClient;
 const databaseURL = require('../app');
 let jwtChecker = require('../jwt');
+let photo = require('../multer');
+let path=require('path');
+
+router.get('/home', function (req, res, next) {
+    res.sendFile(path.join(__dirname, '../uploads/canvas.png'));
+});
+
+router.post('/home', photo.upload, function (req, res) {
+    console.log(req.body.serverDatais);
+    res.send({job: "done"});
+});
 
 //all projects owned by the user provided in the JWT
 router.get('/', jwtChecker.verifyToken, jwtChecker.validateToken, function (req, res, next) {
@@ -31,8 +42,8 @@ router.get('/:projectId', function (req, res) {
                 res.send(result);
             } else {
                 res.status(404).send({
-                   success:false,
-                   message:"Project not found"
+                    success: false,
+                    message: "Project not found"
                 });
             }
         })

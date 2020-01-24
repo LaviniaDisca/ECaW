@@ -12,6 +12,7 @@ document.getElementById('form').addEventListener('submit', (e) => {
             if (req.status === 200) {
                 if (result.success) {
                     localStorage.setItem("ecaw-jwt", result.token);
+                    localStorage.setItem("ecaw-username", user.value);
                     window.location.href = "/home"
                 } else {
                     //todo:show error message

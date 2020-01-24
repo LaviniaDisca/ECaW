@@ -2,19 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="8ef2a1c9-f8a9-4cc5-a1b2-3ebc57edd92d" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/../web app/public/javascripts/Models/Circle.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../web app/public/javascripts/Models/Ellipse.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../web app/public/javascripts/Models/Line.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../web app/public/javascripts/Models/Rectangle.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../web app/public/javascripts/Models/SelectRect.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../web app/public/javascripts/Models/ServerData.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../web app/public/javascripts/Models/Text.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../web app/public/stylesheets/home.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/script.js" beforeDir="false" afterPath="$PROJECT_DIR$/script.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../web app/public/javascripts/home.js" beforeDir="false" afterPath="$PROJECT_DIR$/../web app/public/javascripts/home.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../web app/routes/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/../web app/routes/index.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../web app/views/home.pug" beforeDir="false" afterPath="$PROJECT_DIR$/../web app/views/home.pug" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -42,7 +31,7 @@
     <property name="DefaultHtmlFileTemplate" value="HTML File" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../web app" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../../../multer-upload-example-master" />
     <property name="list.type.of.created.stylesheet" value="CSS" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.detected.package.tslint" value="true" />

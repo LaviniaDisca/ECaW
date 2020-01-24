@@ -52,8 +52,8 @@ function redraw() {
         } else if (history[i] instanceof Circle) {
             drawCircle(context, history[i].centerX, history[i].centerY, history[i].radius, history[i].color, history[i].fill);
         } else if (history[i] instanceof TextInput) {
-            history[i].words.forEach((key)=>{
-                drawText(key,x,y);
+            history[i].words.forEach((key) => {
+                drawText(key, x, y);
             });
             drawText(context, history[i].startingX, history[i].startY, history[i].words, history[i].enterCoords);
         }
@@ -383,7 +383,7 @@ function undo() {
 
     //Display old saved state
     image.src = imgData;
-    image.onload = function() {
+    image.onload = function () {
         context.clearRect(0, 0, canvas.width, canvas.height);
         context.drawImage(image, 0, 0, canvas.width, canvas.height, 0, 0, canvas.width, canvas.height);
     }
@@ -588,7 +588,7 @@ function rgbOf(color) {
     let r = parseInt(color.slice(1, 3), 16),
         g = parseInt(color.slice(3, 5), 16),
         b = parseInt(color.slice(5, 7), 16);
-    return { r: r, g: g, b: b };
+    return {r: r, g: g, b: b};
 }
 
 /**
@@ -596,7 +596,7 @@ function rgbOf(color) {
  */
 function changeCurrentShape(option) {
     console.log(option);
-    if(recentWords.length>0){
+    if (recentWords.length > 0) {
         history.push(T)
     }
     selectedOption = option;
@@ -629,55 +629,48 @@ function asd() {
     document.getElementById("downloader").href = canvasBack.toDataURL("image/png").replace(/^data:image\/[^;]/, 'data:application/octet-stream');
 }
 
-/**
- * This will send the necessary data to the server
- */
 function save() {
-    let req = new XMLHttpRequest();
-    //todo: change endpoint and also send the back canvas
-    req.open("POST", "http://localhost:3000/projects/6", true);
-    req.setRequestHeader('Content-Type', 'application/json');
-    //req.setRequestHeader('Authorization', 'Bearer ' + jwtoken);
-    req.onreadystatechange = function() {
-        //todo: add the message to front-end
-        if (req.readyState === XMLHttpRequest.DONE) {
-            if (req.status === 200) {
-                console.log("Request sent successfully");
-            } else if (req.status === 401) {
-                console.log("error");
-            }
-        }
-    };
-    req.send(JSON.stringify(new ServerData(history, "asd", 6)));
-}
+    canvas.toBlob(function (blob) {
+        var newImg = document.createElement('img'),
+            url = URL.createObjectURL(blob);
 
-function test() {
-    let req = new XMLHttpRequest();
-    //todo: change endpoint
-    req.open("POST", "http://localhost:3000/users/auth", true);
-    req.setRequestHeader('Content-Type', 'application/json');
-    req.onreadystatechange = function() {
-        if (req.readyState === XMLHttpRequest.DONE) {
-            if (req.status === 200) {
-                let result = JSON.parse(req.responseText);
-                if (result.success) {
-                    token = result.token;
-                } else {
-                    //todo:show error message
-                    console.log("Login failed");
+        newImg.onload = function () {
+            // no longer need to read the blob so it's revoked
+            URL.revokeObjectURL(url);
+        };
+
+        let req = new XMLHttpRequest();
+        let formData = new FormData();
+        formData.append("canvas", blob, "canvas.png");
+        formData.append("serverDatais",JSON.stringify(new ServerData(history, "asd", 6)))
+        //todo: change endpoint
+        req.open("POST", "http://localhost:4747/projects/home", true);
+        req.onreadystatechange = function () {
+            if (req.readyState === XMLHttpRequest.DONE) {
+                if (req.status === 200) {
+                    let result = JSON.parse(req.responseText);
+                    if (result.success) {
+                        token = result.token;
+                    } else {
+                        //todo:show error message
+                        console.log("Login failed");
+                    }
+                } else if (req.status === 401) {
+                    console.log("error");
                 }
-            } else if (req.status === 401) {
-                console.log("error");
             }
-        }
-    };
-    req.send(JSON.stringify({ username: "admin", password: "password" }))
+        };
+        req.send(formData)
+    });
 }
 
-/**
- * This will retrieve the data of the project from the server if it exists
- */
 function restore() {
+    /*let img=new Image();
+    img.onload=function () {
+        context.drawImage(img,0,0);
+    };
+    img.src="http://localhost:4747/projects/home";*/
+
     let req = new XMLHttpRequest();
     req.open("GET", "http://localhost:4747/projects", true);
     req.setRequestHeader('Content-Type', 'application/json');
@@ -692,5 +685,5 @@ function restore() {
             }
         }
     };
-    req.send(JSON.stringify({ username: "admin", password: "password" }))
+    req.send(null);
 }
