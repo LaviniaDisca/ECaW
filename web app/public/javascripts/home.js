@@ -3,13 +3,11 @@ let selectedOption;
 let color = "#000000";
 let history = [];
 //Stores every word
-let recentWords = '';
-let startingX = 0;
 let selectedShape = undefined;
 let currentHandle = undefined;
 let fill = false;
 let selectedItem = undefined;
-let copyX, copyY;
+let currentText = undefined;
 
 let token = localStorage.getItem("ecaw-jwt");
 
@@ -51,9 +49,14 @@ function redraw() {
         } else if (history[i] instanceof Circle) {
             drawCircle(context, history[i].centerX, history[i].centerY, history[i].radius, history[i].color, history[i].fill);
         } else if (history[i] instanceof TextInput) {
+            let x = history[i].startingX;
+            let y = history[i].startY;
             history[i].words.forEach((key) => {
-                drawText(key, history[i].startingX, history[i].startY);
+                let increase = drawKey(key, x, y, history[i].startingX);
+                x += increase.x;
+                y += increase.y;
             });
+
         }
     }
     // Draw the selection rect if there's one
@@ -74,10 +77,6 @@ function drawGhost() {
             drawEllipse(ghostContext, history[i].x, history[i].y, history[i].toX, history[i].toY, "#ffffff", history[i].fill);
         } else if (history[i] instanceof Circle) {
             drawCircle(ghostContext, history[i].centerX, history[i].centerY, history[i].radius, "#ffffff", history[i].fill);
-        } else if (history[i] instanceof TextInput) {
-            history[i].words.forEach((key) => {
-                drawText(key, history[i].startingX, history[i].startY);
-            });
         }
     }
 }
@@ -117,7 +116,7 @@ function drawSelectedShape() {
 }
 
 /**
- * Mouse Handlers
+ * Handlers
  */
 function handleMouseDown(e) {
     e.preventDefault();
@@ -126,8 +125,8 @@ function handleMouseDown(e) {
     startY = e.offsetY;
     isDown = true;
     if (selectedOption === 'text') {
-        recentWords = [];
-        startingX = e.offsetX;
+        currentText = new TextInput(e.offsetX, startY, []);
+        history.push(currentText);
     }
     if (selectedOption === "selector") {
         // if the mouse is over a handle don't try to search for another shape
@@ -364,71 +363,59 @@ function handleMouseMove(e) {
 
 }
 
+function handleTextKeyPress(key) {
+    if (key === 'Backspace') {
+        if (currentText.words.length < 1) {
+            return;
+        }
+        //sterge ultima litera si redeseneaza
+        let recentChar = currentText.words.pop();
+        if (recentChar === "Enter") {
+            let lastWord = currentText.words.join("").split("Enter").reverse()[0];
+            let length = context.measureText(lastWord).width;
+            startX = currentText.startingX + length;
+            //todo:replace with fontsize+4
+            startY -= 20;
+        } else {
+            startX -= context.measureText(recentChar).width;
+        }
+        redraw();
+    } else {
+        let increase = drawKey(key, startX, startY, currentText.startingX);
+        startX += increase.x;
+        startY += increase.y;
+        currentText.words.push(key);
+    }
+}
 
 /**
  * Draw functions
  *
  **/
 
-//Array for backspace
-let undoList = [];
 
-function undo() {
-    undoList.pop();
-
-    let imgData = undoList[undoList.length - 1];
-    let image = new Image();
-
-    //Display old saved state
-    image.src = imgData;
-    image.onload = function () {
-        context.clearRect(0, 0, canvas.width, canvas.height);
-        context.drawImage(image, 0, 0, canvas.width, canvas.height, 0, 0, canvas.width, canvas.height);
-    }
-}
-
-function saveState() {
-    undoList.push(canvas.toDataURL());
-}
-
-document.addEventListener('keydown', (ev) => {
-    if (selectedOption !== "text") {
-        return;
-    }
-    ev.preventDefault();
+/**
+ *  Draws a letter and modifies returns the adjustments to be done to x,y
+ */
+function drawKey(key, x, y, startingX) {
+    //todo: add font-size and type to parameters and to the model
     context.font = '16px Arial';
-
-    if (ev.key === 'Backspace') {
-        undo();
-
-        //Remove recent word
-        let recentWord = recentWords[recentWords.length - 1];
-
-        startX -= context.measureText(recentWord).width;
-
-        recentWords -= recentWord;
-    } else {
-        drawText(ev.key, startX, startY);
-        recentWords += ev.key;
-        saveState();
-    }
-});
-
-function drawText(key, x, y) {
-    copyX = x;
-    copyY = y;
-    if (key === 'Enter') {
-        // Press Enter
-        copyX = startingX;
-        copyY += 20; //The size of the font + 4
+    let result = {
+        x: 0,
+        y: 0
+    };
+    //handle the ENTER key
+    if (key === "Enter") {
+        result.x = startingX - x;
+        result.y += 20; //The size of the font + 4
     } else {
         context.fillStyle = color;
-        context.fillText(key, copyX, copyY);
-        context.fill();
+        context.fillText(key, x, y);
 
         //Move cursor after every character
-        copyX += context.measureText(key).width;
+        result.x = context.measureText(key).width;
     }
+    return result;
 }
 
 function drawRectangle(context, x, y, toX, toY, color, fill = false) {
@@ -463,6 +450,7 @@ function drawCircle(context, x, y, radius, color, fill = false) {
 }
 
 function drawEllipse(context, x, y, toX, toY, color, fill = false) {
+    console.log(fill);
     context.beginPath();
     context.ellipse(x + (toX - x) / 2, y + (toY - y) / 2, Math.abs((toX - x) / 2), Math.abs((toY - y) / 2), 0, 0, Math.PI * 2, false);
     if (!fill) {
@@ -596,10 +584,10 @@ function rgbOf(color) {
  * Options triggers
  */
 function changeCurrentShape(option) {
-    if (recentWords.length > 0 && option !== 'text') {
-        history.push(new TextInput(startingX, startY, recentWords));
+    //reset the selected text just in case i guess
+    if (currentText) {
+        currentText = undefined;
     }
-    console.log(option);
     selectedOption = option;
     startX = undefined;
     startY = undefined;
@@ -610,6 +598,15 @@ function changeCurrentShape(option) {
     }
     document.getElementById('current').innerHTML = `Shape : ${option}`;
 }
+
+document.addEventListener('keydown', (e) => {
+    if (selectedOption === "text") {
+        e.preventDefault();
+        handleTextKeyPress(e.key);
+    } else {
+        //todo: probably add shortcuts here?
+    }
+});
 
 canvas.addEventListener('mousedown', (e) => {
     handleMouseDown(e);
@@ -653,26 +650,30 @@ function save() {
 }
 
 function test() {
-    let req = new XMLHttpRequest();
-    //todo: change endpoint
-    req.open("POST", "http://localhost:3000/users/auth", true);
-    req.setRequestHeader('Content-Type', 'application/json');
-    req.onreadystatechange = function () {
-        if (req.readyState === XMLHttpRequest.DONE) {
-            if (req.status === 200) {
-                let result = JSON.parse(req.responseText);
-                if (result.success) {
-                    token = result.token;
-                } else {
-                    //todo:show error message
-                    console.log("Login failed");
-                }
-            } else if (req.status === 401) {
-                console.log("error");
-            }
-        }
-    };
-    req.send(JSON.stringify({username: "admin", password: "password"}))
+    history.push(new TextInput(50, 50, ["a", "s"]));
+    console.log(history);
+    redraw();
+
+    /* let req = new XMLHttpRequest();
+     //todo: change endpoint
+     req.open("POST", "http://localhost:3000/users/auth", true);
+     req.setRequestHeader('Content-Type', 'application/json');
+     req.onreadystatechange = function () {
+         if (req.readyState === XMLHttpRequest.DONE) {
+             if (req.status === 200) {
+                 let result = JSON.parse(req.responseText);
+                 if (result.success) {
+                     token = result.token;
+                 } else {
+                     //todo:show error message
+                     console.log("Login failed");
+                 }
+             } else if (req.status === 401) {
+                 console.log("error");
+             }
+         }
+     };
+     req.send(JSON.stringify({username: "admin", password: "password"}))*/
 }
 
 /**

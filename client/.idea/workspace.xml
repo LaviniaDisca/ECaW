@@ -2,15 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="8ef2a1c9-f8a9-4cc5-a1b2-3ebc57edd92d" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/../web app/public/images/back.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../web app/public/stylesheets/projects.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../web app/views/projects.pug" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/index.css" beforeDir="false" afterPath="$PROJECT_DIR$/index.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../web app/public/javascripts/Models/Text.js" beforeDir="false" afterPath="$PROJECT_DIR$/../web app/public/javascripts/Models/Text.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../web app/public/javascripts/home.js" beforeDir="false" afterPath="$PROJECT_DIR$/../web app/public/javascripts/home.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../web app/routes/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/../web app/routes/index.js" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
