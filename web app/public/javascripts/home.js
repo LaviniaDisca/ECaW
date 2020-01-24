@@ -696,3 +696,7 @@ function restore() {
     };
     req.send(JSON.stringify({username: "admin", password: "password"}))
 }
+
+document.getElementById('backpage').addEventListener('click', (ev) => {
+    window.location.href = '/projects';
+});

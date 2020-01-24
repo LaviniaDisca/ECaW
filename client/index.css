@@ -6,7 +6,7 @@ canvas {
 }
 
 .history {
-    top: 5%;
+    top: 6%;
     position: absolute;
     right: 0;
     background-color: #333;
@@ -16,19 +16,32 @@ canvas {
     white-space: nowrap;
 }
 
-.history nav button{
+.menu {
+    height: 6%;
+    position: absolute;
+    right: 0;
+    background-color: #333;
+    overflow: auto;
+    width: 20%;
+    white-space: nowrap;
+}
+
+.menu button {
     display: inline-block;
-    width: 50%;
+    padding: 10px;
 }
 
 .history button {
+    width: 100%;
     display: block;
     color: white;
     text-align: center;
     padding: 14px;
     text-decoration: none;
 }
-
+.menu button:hover{
+    background-color: #777;
+}
 .history button:hover {
     background-color: #777;
 }

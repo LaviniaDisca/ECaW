@@ -1,8 +1,55 @@
 canvas {
-    position: relative;
-    left: 13%;
+    position: absolute;
+    left: 15%;
+    right: 10%;
     cursor: crosshair;
 }
+
+.history {
+    top: 6%;
+    position: absolute;
+    right: 0;
+    background-color: #333;
+    overflow: auto;
+    height: 90%;
+    width: 20%;
+    white-space: nowrap;
+}
+
+.menu {
+    height: 6%;
+    position: absolute;
+    right: 0;
+    background-color: #333;
+    overflow: auto;
+    width: 20%;
+    white-space: nowrap;
+}
+
+.menu button {
+    display: inline-block;
+    padding: 10px;
+}
+
+.history button {
+    width: 100%;
+    display: block;
+    color: white;
+    text-align: center;
+    padding: 14px;
+    text-decoration: none;
+}
+.menu button:hover{
+    background-color: #777;
+}
+.history button:hover {
+    background-color: #777;
+}
+
+/*.history a.active{*/
+/*    background-color: #4CAF50; !* Add a green color to the "active/current" link *!*/
+/*    color: white;*/
+/*}*/
 
 #options {
     position: fixed;

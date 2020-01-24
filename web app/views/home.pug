@@ -1,8 +1,9 @@
 doctype html
 head
-    meta(charset='UTF-8')
+    meta(charset='UTF-8' name='viewport' content='width=device-width, initial-scale=1')
     title Canvas
     link(rel='stylesheet' type='text/css' href='stylesheets/home.css')
+    link(rel='stylesheet' href='https://use.fontawesome.com/releases/v5.7.2/css/all.css' integrity='sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr' crossorigin='anonymous')
 #options
     #current.choice
     br
@@ -36,6 +37,25 @@ head
     a#downloader.buttonDownload(href='#' onclick='asd()' download='image.png') Download!
     br
 canvas
+.menu
+    button#backpage
+        i.fas.fa-arrow-left
+        |  Back
+    button#saveproject
+        i.far.fa-save
+        |  Save Project
+.history
+    button Button1
+    br
+    button Button1
+    br
+    button Button1
+    br
+    button Button1
+    br
+    button Button1
+    br
+    button Button1
 script(src='javascripts/Models/Circle.js')
 script(src='javascripts/Models/ServerData.js')
 script(src='javascripts/Models/SelectRect.js')
