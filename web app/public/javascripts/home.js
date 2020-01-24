@@ -3,14 +3,13 @@ let selectedOption;
 let color = "#000000";
 let history = [];
 //Stores every word
-let recentWords = [];
+let recentWords = '';
 let startingX = 0;
 let selectedShape = undefined;
 let currentHandle = undefined;
 let fill = false;
 let selectedItem = undefined;
-let enterCoords = [];
-
+let copyX, copyY;
 
 let token = localStorage.getItem("ecaw-jwt");
 
@@ -52,10 +51,9 @@ function redraw() {
         } else if (history[i] instanceof Circle) {
             drawCircle(context, history[i].centerX, history[i].centerY, history[i].radius, history[i].color, history[i].fill);
         } else if (history[i] instanceof TextInput) {
-            history[i].words.forEach((key)=>{
-                drawText(key,x,y);
+            history[i].words.forEach((key) => {
+                drawText(key, history[i].startingX, history[i].startY);
             });
-            drawText(context, history[i].startingX, history[i].startY, history[i].words, history[i].enterCoords);
         }
     }
     // Draw the selection rect if there's one
@@ -77,7 +75,9 @@ function drawGhost() {
         } else if (history[i] instanceof Circle) {
             drawCircle(ghostContext, history[i].centerX, history[i].centerY, history[i].radius, "#ffffff", history[i].fill);
         } else if (history[i] instanceof TextInput) {
-            drawText(ghostContext, history[i].startingX, history[i].startY, history[i].words, history[i].enterCoords);
+            history[i].words.forEach((key) => {
+                drawText(key, history[i].startingX, history[i].startY);
+            });
         }
     }
 }
@@ -172,8 +172,6 @@ function handleMouseUp(e) {
             history.push(new Line(startX, startY, endX, endY, color));
         } else if (selectedOption === "ellipse" && endX !== undefined) {
             history.push(new Ellipse(startX, startY, endX, endY, color, fill));
-        } else if (selectedOption === 'text') {
-            history.push(new TextInput(startingX, startY, recentWords, enterCoords));
         } else if (selectedOption === "circle" && endX !== undefined) {
             history.push(new Circle(startX, startY, 50, color, fill));
             redraw();
@@ -383,7 +381,7 @@ function undo() {
 
     //Display old saved state
     image.src = imgData;
-    image.onload = function() {
+    image.onload = function () {
         context.clearRect(0, 0, canvas.width, canvas.height);
         context.drawImage(image, 0, 0, canvas.width, canvas.height, 0, 0, canvas.width, canvas.height);
     }
@@ -400,12 +398,7 @@ document.addEventListener('keydown', (ev) => {
     ev.preventDefault();
     context.font = '16px Arial';
 
-    drawText(ev.key);
-    recentWords.push(ev.key);
-});
-
-function drawText(key) {
-    if (key === 'Backspace') {
+    if (ev.key === 'Backspace') {
         undo();
 
         //Remove recent word
@@ -413,20 +406,28 @@ function drawText(key) {
 
         startX -= context.measureText(recentWord).width;
 
-        recentWords.pop();
-    } else if (key === 'Enter') {
+        recentWords -= recentWord;
+    } else {
+        drawText(ev.key, startX, startY);
+        recentWords += ev.key;
+        saveState();
+    }
+});
+
+function drawText(key, x, y) {
+    copyX = x;
+    copyY = y;
+    if (key === 'Enter') {
         // Press Enter
-        enterCoords.push(startX);
-        startX = startingX;
-        startY += 20; //The size of the font + 4
+        copyX = startingX;
+        copyY += 20; //The size of the font + 4
     } else {
         context.fillStyle = color;
-        context.fillText(key, startX, startY);
+        context.fillText(key, copyX, copyY);
         context.fill();
 
         //Move cursor after every character
-        startX += context.measureText(key).width;
-        saveState();
+        copyX += context.measureText(key).width;
     }
 }
 
@@ -588,17 +589,17 @@ function rgbOf(color) {
     let r = parseInt(color.slice(1, 3), 16),
         g = parseInt(color.slice(3, 5), 16),
         b = parseInt(color.slice(5, 7), 16);
-    return { r: r, g: g, b: b };
+    return {r: r, g: g, b: b};
 }
 
 /**
  * Options triggers
  */
 function changeCurrentShape(option) {
-    console.log(option);
-    if(recentWords.length>0){
-        history.push(T)
+    if (recentWords.length > 0 && option !== 'text') {
+        history.push(new TextInput(startingX, startY, recentWords));
     }
+    console.log(option);
     selectedOption = option;
     startX = undefined;
     startY = undefined;
@@ -638,7 +639,7 @@ function save() {
     req.open("POST", "http://localhost:3000/projects/6", true);
     req.setRequestHeader('Content-Type', 'application/json');
     //req.setRequestHeader('Authorization', 'Bearer ' + jwtoken);
-    req.onreadystatechange = function() {
+    req.onreadystatechange = function () {
         //todo: add the message to front-end
         if (req.readyState === XMLHttpRequest.DONE) {
             if (req.status === 200) {
@@ -656,7 +657,7 @@ function test() {
     //todo: change endpoint
     req.open("POST", "http://localhost:3000/users/auth", true);
     req.setRequestHeader('Content-Type', 'application/json');
-    req.onreadystatechange = function() {
+    req.onreadystatechange = function () {
         if (req.readyState === XMLHttpRequest.DONE) {
             if (req.status === 200) {
                 let result = JSON.parse(req.responseText);
@@ -671,7 +672,7 @@ function test() {
             }
         }
     };
-    req.send(JSON.stringify({ username: "admin", password: "password" }))
+    req.send(JSON.stringify({username: "admin", password: "password"}))
 }
 
 /**
@@ -682,7 +683,7 @@ function restore() {
     req.open("GET", "http://localhost:4747/projects", true);
     req.setRequestHeader('Content-Type', 'application/json');
     req.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('ecaw-jwt'));
-    req.onreadystatechange = function() {
+    req.onreadystatechange = function () {
         if (req.readyState === XMLHttpRequest.DONE) {
             if (req.status === 200) {
                 let components = JSON.parse(req.responseText);
@@ -692,5 +693,5 @@ function restore() {
             }
         }
     };
-    req.send(JSON.stringify({ username: "admin", password: "password" }))
+    req.send(JSON.stringify({username: "admin", password: "password"}))
 }
