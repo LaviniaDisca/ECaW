@@ -3,13 +3,16 @@ let selectedOption;
 let color = "#000000";
 let history = [];
 //Stores every word
-let recentWords = [];
-let startingX = 0;
 let selectedShape = undefined;
 let currentHandle = undefined;
 let fill = false;
 let selectedItem = undefined;
-let enterCoords = [];
+let currentText = undefined;
+let nbR = 0,
+    nbC = 0,
+    nbE = 0,
+    nbT = 0,
+    nbL = 0;
 let token = localStorage.getItem("ecaw-jwt");
 
 console.log(projectId);
@@ -51,10 +54,14 @@ function redraw() {
         } else if (history[i] instanceof Circle) {
             drawCircle(context, history[i].centerX, history[i].centerY, history[i].radius, history[i].color, history[i].fill);
         } else if (history[i] instanceof TextInput) {
+            let x = history[i].startingX;
+            let y = history[i].startY;
             history[i].words.forEach((key) => {
-                drawText(key, x, y);
+                let increase = drawKey(key, x, y, history[i].startingX);
+                x += increase.x;
+                y += increase.y;
             });
-            drawText(context, history[i].startingX, history[i].startY, history[i].words, history[i].enterCoords);
+
         }
     }
     // Draw the selection rect if there's one
@@ -75,8 +82,6 @@ function drawGhost() {
             drawEllipse(ghostContext, history[i].x, history[i].y, history[i].toX, history[i].toY, "#ffffff", history[i].fill);
         } else if (history[i] instanceof Circle) {
             drawCircle(ghostContext, history[i].centerX, history[i].centerY, history[i].radius, "#ffffff", history[i].fill);
-        } else if (history[i] instanceof TextInput) {
-            drawText(ghostContext, history[i].startingX, history[i].startY, history[i].words, history[i].enterCoords);
         }
     }
 }
@@ -116,7 +121,7 @@ function drawSelectedShape() {
 }
 
 /**
- * Mouse Handlers
+ * Handlers
  */
 function handleMouseDown(e) {
     e.preventDefault();
@@ -125,8 +130,11 @@ function handleMouseDown(e) {
     startY = e.offsetY;
     isDown = true;
     if (selectedOption === 'text') {
-        recentWords = [];
-        startingX = e.offsetX;
+        currentText = new TextInput(e.offsetX, startY, []);
+        history.push(currentText);
+        nbT++;
+        const newOb = `<button id="t" value="${history.length - 1}">Text ${nbT}</button><br>`;
+        document.getElementById('history').innerHTML += newOb;
     }
     if (selectedOption === "selector") {
         // if the mouse is over a handle don't try to search for another shape
@@ -167,21 +175,73 @@ function handleMouseUp(e) {
         //the drawing "animation" is over so we push the resulting shape into the history
         if (selectedOption === "rectangle" && endX !== undefined) {
             history.push(new Rectangle(startX, startY, endX, endY, color, fill));
+            nbR++;
+            const newOb = `<button id="r" value="${history.length - 1}">Rectangle ${nbR}</button><br>`;
+            document.getElementById('history').innerHTML += newOb;
         } else if (selectedOption === "line" && endX !== undefined) {
             history.push(new Line(startX, startY, endX, endY, color));
+            nbL++;
+            const newOb = `<button id="l" value="${history.length - 1}">Line ${nbL}</button><br>`;
+            document.getElementById('history').innerHTML += newOb;
         } else if (selectedOption === "ellipse" && endX !== undefined) {
             history.push(new Ellipse(startX, startY, endX, endY, color, fill));
-        } else if (selectedOption === 'text') {
-            history.push(new TextInput(startingX, startY, recentWords, enterCoords));
+            nbE++;
+            const newOb = `<button id="e" value="${history.length - 1}">Ellipse ${nbE}</button><br>`;
+            document.getElementById('history').innerHTML += newOb;
         } else if (selectedOption === "circle" && endX !== undefined) {
             history.push(new Circle(startX, startY, 50, color, fill));
+            nbC++;
+            const newOb = `<button id="c" value="${history.length - 1}">Circle ${nbC}</button><br>`;
+            document.getElementById('history').innerHTML += newOb;
             redraw();
         }
     }
     endX = undefined;
     endY = undefined;
     console.log(history);
+}
 
+function changeInfo(shape, index) {
+    if (shape === 'rectangle') {
+        let form = `<form id="rInfo">
+                        <label for="x">x coord<input id="x" type="number" value="x" placeholder="${history[index].x}" onchange="x=value"/></label><br/>
+                        <label for="y">y coord<input id="y" type="number" value="y" placeholder="${history[index].y}" onchange="y=value"/></label><br/>
+                        <label for="toX">toX coord<input id="toX" type="number" value="toX" placeholder="${history[index].toX}" onchange="toX=value"/></label><br/>
+                        <label for="toY">toY coord<input id="toY" type="number" value="toY" placeholder="${history[index].toY}" onchange="toY=value"/></label><br/>
+                        <label for="width">width<input id="width" type="number" value="width" placeholder="${history[index].width}" onchange="width=value"/></label><br/>
+                        <label for="height">height<input id="height" type="number" value="height" placeholder="${history[index].height}" onchange="height=value"/></label><br/>
+                        <label for="colorR">Color<input id="colorR" type="color" value="color" placeholder="${history[index].color}" onchange="colorR=value"/></label><br/>
+                        </form>`;
+        document.getElementById('history').innerHTML += form;
+    } else if (shape === 'line') {
+        let form = `<form id="lInfo">
+                        <label for="x">x coord<input id="x" type="number" value="x" placeholder="${history[index].x}" onchange="x=value"/></label><br/>
+                        <label for="y">y coord<input id="y" type="number" value="y" placeholder="${history[index].y}" onchange="y=value"/></label><br/>
+                        <label for="toX">toX coord<input id="toX" type="number" value="toX" placeholder="${history[index].toX}" onchange="toX=value"/></label><br/>
+                        <label for="toY">toY coord<input id="toY" type="number" value="toY" placeholder="${history[index].toY}" onchange="toY=value"/></label><br/>
+                        <label for="colorR">Color<input id="colorR" type="color" value="color" placeholder="${history[index].color}" onchange="colorR=value"/></label><br/>
+                        </form>`;
+        document.getElementById('history').innerHTML += form;
+    } else if (shape === 'ellipse') {
+        let form = `<form id="eInfo">
+                        <label for="x">x coord<input id="x" type="number" value="x" placeholder="${history[index].x}" onchange="x=value"/></label><br/>
+                        <label for="y">y coord<input id="y" type="number" value="y" placeholder="${history[index].y}" onchange="y=value"/></label><br/>
+                        <label for="toX">toX coord<input id="toX" type="number" value="toX" placeholder="${history[index].toX}" onchange="toX=value"/></label><br/>
+                        <label for="toY">toY coord<input id="toY" type="number" value="toY" placeholder="${history[index].toY}" onchange="toY=value"/></label><br/>
+                        <label for="colorR">Color<input id="colorR" type="color" value="color" placeholder="${history[index].color}" onchange="colorR=value"/></label><br/>
+                        <label for="fill">fill<input id="fill" type="checkbox" value="fill" placeholder="${history[index].width}" onchange="fill=value"/></label><br/>
+                        </form>`;
+        document.getElementById('history').innerHTML += form;
+    } else if (shape === 'circle') {
+        let form = `<form id="cInfo">
+                        <label for="centerX">centerX coord<input id="centerX" type="number" value="centerX" placeholder="${history[index].x}" onchange="centerX=value"/></label><br/>
+                        <label for="centerY">centerY coord<input id="centerY" type="number" value="centerY" placeholder="${history[index].y}" onchange="centerY=value"/></label><br/>
+                        <label for="radius">radius coord<input id="radius" type="number" value="radius" placeholder="${history[index].toX}" onchange="radius=value"/></label><br/>
+                        <label for="colorR">Color<input id="colorR" type="color" value="color" placeholder="${history[index].color}" onchange="colorR=value"/></label><br/>
+                        <label for="fill">fill<input id="fill" type="checkbox" value="fill" placeholder="${history[index].width}" onchange="fill=value"/></label><br/>
+                        </form>`;
+        document.getElementById('history').innerHTML += form;
+    }
 }
 
 function handleMouseMove(e) {
@@ -365,68 +425,59 @@ function handleMouseMove(e) {
 
 }
 
+function handleTextKeyPress(key) {
+    if (key === 'Backspace') {
+        if (currentText.words.length < 1) {
+            return;
+        }
+        //sterge ultima litera si redeseneaza
+        let recentChar = currentText.words.pop();
+        if (recentChar === "Enter") {
+            let lastWord = currentText.words.join("").split("Enter").reverse()[0];
+            let length = context.measureText(lastWord).width;
+            startX = currentText.startingX + length;
+            //todo:replace with fontsize+4
+            startY -= 20;
+        } else {
+            startX -= context.measureText(recentChar).width;
+        }
+        redraw();
+    } else {
+        let increase = drawKey(key, startX, startY, currentText.startingX);
+        startX += increase.x;
+        startY += increase.y;
+        currentText.words.push(key);
+    }
+}
 
 /**
  * Draw functions
  *
  **/
 
-//Array for backspace
-let undoList = [];
 
-function undo() {
-    undoList.pop();
-
-    let imgData = undoList[undoList.length - 1];
-    let image = new Image();
-
-    //Display old saved state
-    image.src = imgData;
-    image.onload = function () {
-        context.clearRect(0, 0, canvas.width, canvas.height);
-        context.drawImage(image, 0, 0, canvas.width, canvas.height, 0, 0, canvas.width, canvas.height);
-    }
-}
-
-function saveState() {
-    undoList.push(canvas.toDataURL());
-}
-
-document.addEventListener('keydown', (ev) => {
-    if (selectedOption !== "text") {
-        return;
-    }
-    ev.preventDefault();
+/**
+ *  Draws a letter and modifies returns the adjustments to be done to x,y
+ */
+function drawKey(key, x, y, startingX) {
+    //todo: add font-size and type to parameters and to the model
     context.font = '16px Arial';
-
-    drawText(ev.key);
-    recentWords.push(ev.key);
-});
-
-function drawText(key) {
-    if (key === 'Backspace') {
-        undo();
-
-        //Remove recent word
-        let recentWord = recentWords[recentWords.length - 1];
-
-        startX -= context.measureText(recentWord).width;
-
-        recentWords.pop();
-    } else if (key === 'Enter') {
-        // Press Enter
-        enterCoords.push(startX);
-        startX = startingX;
-        startY += 20; //The size of the font + 4
+    let result = {
+        x: 0,
+        y: 0
+    };
+    //handle the ENTER key
+    if (key === "Enter") {
+        result.x = startingX - x;
+        result.y += 20; //The size of the font + 4
     } else {
         context.fillStyle = color;
-        context.fillText(key, startX, startY);
-        context.fill();
+        context.fillText(key, x, y);
 
         //Move cursor after every character
-        startX += context.measureText(key).width;
-        saveState();
+        result.x = context.measureText(key).width;
     }
+    return result;
 }
 
 function drawRectangle(context, x, y, toX, toY, color, fill = false) {
@@ -461,6 +512,7 @@ function drawCircle(context, x, y, radius, color, fill = false) {
 }
 
 function drawEllipse(context, x, y, toX, toY, color, fill = false) {
+    console.log(fill);
     context.beginPath();
     context.ellipse(x + (toX - x) / 2, y + (toY - y) / 2, Math.abs((toX - x) / 2), Math.abs((toY - y) / 2), 0, 0, Math.PI * 2, false);
     if (!fill) {
@@ -588,16 +640,16 @@ function rgbOf(color) {
     let r = parseInt(color.slice(1, 3), 16),
         g = parseInt(color.slice(3, 5), 16),
         b = parseInt(color.slice(5, 7), 16);
-    return {r: r, g: g, b: b};
+    return { r: r, g: g, b: b };
 }
 
 /**
  * Options triggers
  */
 function changeCurrentShape(option) {
-    console.log(option);
-    if (recentWords.length > 0) {
-        history.push(T)
+    //reset the selected text just in case i guess
+    if (currentText) {
+        currentText = undefined;
     }
     selectedOption = option;
     startX = undefined;
@@ -610,6 +662,15 @@ function changeCurrentShape(option) {
     document.getElementById('current').innerHTML = `Shape : ${option}`;
 }
 
+document.addEventListener('keydown', (e) => {
+    if (selectedOption === "text") {
+        e.preventDefault();
+        handleTextKeyPress(e.key);
+    } else {
+        //todo: probably add shortcuts here?
+    }
+});
+
 canvas.addEventListener('mousedown', (e) => {
     handleMouseDown(e);
 });
@@ -618,6 +679,25 @@ canvas.addEventListener('mouseup', (e) => {
 });
 canvas.addEventListener('mousemove', (e) => {
     handleMouseMove(e);
+});
+
+let h = document.getElementById('history');
+h.addEventListener('click', (ev) => {
+    let button = h.querySelector('button');
+
+    button.addEventListener('click', (ev) => {
+        if (button.id === 'r') {
+            changeInfo('rectangle', parseInt(button.value));
+        } else if (button.id === 'l') {
+            changeInfo('line', parseInt(button.value));
+        } else if (button.id === 'e') {
+            changeInfo('ellipse', parseInt(button.value));
+        } else if (button.id === 'c') {
+            changeInfo('circle', parseInt(button.value));
+        } else if (button.id === 't') {
+            changeInfo('text', parseInt(button.value));
+        }
+    });
 });
 
 /**
@@ -634,7 +714,7 @@ function save() {
     req.open("POST", `http://localhost:4747/projects/${projectId}`, true);
     req.setRequestHeader('Content-Type', 'application/json');
     req.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('ecaw-jwt'));
-    req.onreadystatechange = function () {
+    req.onreadystatechange = function() {
         if (req.readyState === XMLHttpRequest.DONE) {
             if (req.status === 200) {
                 let response = JSON.parse(req.responseText);
@@ -662,13 +742,13 @@ function updateServerCanvas(canvasType) {
         canvasToSave = canvasBack;
         fileName = "canvas-back.png";
     }
-    canvasToSave.toBlob(function (blob) {
+    canvasToSave.toBlob(function(blob) {
         let req = new XMLHttpRequest();
         let formData = new FormData();
         formData.append("canvas", blob, fileName);
         req.open("POST", `http://localhost:4747/projects/photo/${projectId}`, true);
         req.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('ecaw-jwt'));
-        req.onreadystatechange = function () {
+        req.onreadystatechange = function() {
             if (req.readyState === XMLHttpRequest.DONE) {
                 if (req.status === 200) {
                     console.log(req.responseText);
@@ -683,7 +763,7 @@ function updateServerCanvas(canvasType) {
 
 function restore() {
     let img = new Image();
-    img.onload = function () {
+    img.onload = function() {
         ghostContext.drawImage(img, 0, 0);
         redraw();
     };
@@ -695,7 +775,7 @@ function restore() {
     console.log(`http://localhost:4747/projects/${projectId}`);
     req.open("GET", `http://localhost:4747/projects/${projectId}`, true);
     req.setRequestHeader('Content-Type', 'application/json');
-    req.onreadystatechange = function () {
+    req.onreadystatechange = function() {
         if (req.readyState === XMLHttpRequest.DONE) {
             if (req.status === 200) {
                 let components = JSON.parse(req.responseText);
@@ -710,3 +790,7 @@ function restore() {
     };
     req.send(null);
 }
+
+document.getElementById('backpage').addEventListener('click', (ev) => {
+    window.location.href = '/projects';
+});
