@@ -145,15 +145,13 @@ function handleMouseDown(e) {
         let found = false;
         history.slice().reverse().forEach((item) => {
             if (!found && cursorInShape(e.offsetX, e.offsetY, item)) {
-                selectedShape = new SelectRect(item.x, item.y, item.toX, item.toY);
-                selectedItem = item;
+                changeSelection(item, new SelectRect(item.x, item.y, item.toX, item.toY));
                 found = true;
             }
         });
         //if nothing is found undefine variables in case the user clicked outside any shape
         if (!found) {
-            selectedShape = undefined;
-            selectedItem = undefined;
+            changeSelection(undefined, undefined);
         }
     }
     if (selectedOption === "fill") {
@@ -203,45 +201,20 @@ function handleMouseUp(e) {
 
 function changeInfo(shape, index) {
     if (shape === 'rectangle') {
-        let form = `<form id="rInfo">
-                        <label for="x">x coord<input id="x" type="number" value="x" placeholder="${history[index].x}" onchange="x=value"/></label><br/>
-                        <label for="y">y coord<input id="y" type="number" value="y" placeholder="${history[index].y}" onchange="y=value"/></label><br/>
-                        <label for="toX">toX coord<input id="toX" type="number" value="toX" placeholder="${history[index].toX}" onchange="toX=value"/></label><br/>
-                        <label for="toY">toY coord<input id="toY" type="number" value="toY" placeholder="${history[index].toY}" onchange="toY=value"/></label><br/>
-                        <label for="width">width<input id="width" type="number" value="width" placeholder="${history[index].width}" onchange="width=value"/></label><br/>
-                        <label for="height">height<input id="height" type="number" value="height" placeholder="${history[index].height}" onchange="height=value"/></label><br/>
-                        <label for="colorR">Color<input id="colorR" type="color" value="color" placeholder="${history[index].color}" onchange="colorR=value"/></label><br/>
-                        </form>`;
-        document.getElementById('history').innerHTML += form;
+        document.getElementById('history').innerHTML += getRectangleEditor(index);
     } else if (shape === 'line') {
-        let form = `<form id="lInfo">
-                        <label for="x">x coord<input id="x" type="number" value="x" placeholder="${history[index].x}" onchange="x=value"/></label><br/>
-                        <label for="y">y coord<input id="y" type="number" value="y" placeholder="${history[index].y}" onchange="y=value"/></label><br/>
-                        <label for="toX">toX coord<input id="toX" type="number" value="toX" placeholder="${history[index].toX}" onchange="toX=value"/></label><br/>
-                        <label for="toY">toY coord<input id="toY" type="number" value="toY" placeholder="${history[index].toY}" onchange="toY=value"/></label><br/>
-                        <label for="colorR">Color<input id="colorR" type="color" value="color" placeholder="${history[index].color}" onchange="colorR=value"/></label><br/>
-                        </form>`;
-        document.getElementById('history').innerHTML += form;
+        document.getElementById('history').innerHTML += getLineEditor(index);
     } else if (shape === 'ellipse') {
-        let form = `<form id="eInfo">
-                        <label for="x">x coord<input id="x" type="number" value="x" placeholder="${history[index].x}" onchange="x=value"/></label><br/>
-                        <label for="y">y coord<input id="y" type="number" value="y" placeholder="${history[index].y}" onchange="y=value"/></label><br/>
-                        <label for="toX">toX coord<input id="toX" type="number" value="toX" placeholder="${history[index].toX}" onchange="toX=value"/></label><br/>
-                        <label for="toY">toY coord<input id="toY" type="number" value="toY" placeholder="${history[index].toY}" onchange="toY=value"/></label><br/>
-                        <label for="colorR">Color<input id="colorR" type="color" value="color" placeholder="${history[index].color}" onchange="colorR=value"/></label><br/>
-                        <label for="fill">fill<input id="fill" type="checkbox" value="fill" placeholder="${history[index].width}" onchange="fill=value"/></label><br/>
-                        </form>`;
-        document.getElementById('history').innerHTML += form;
+        document.getElementById('history').innerHTML += getEllipseEditor(index);
     } else if (shape === 'circle') {
-        let form = `<form id="cInfo">
-                        <label for="centerX">centerX coord<input id="centerX" type="number" value="centerX" placeholder="${history[index].x}" onchange="centerX=value"/></label><br/>
-                        <label for="centerY">centerY coord<input id="centerY" type="number" value="centerY" placeholder="${history[index].y}" onchange="centerY=value"/></label><br/>
-                        <label for="radius">radius coord<input id="radius" type="number" value="radius" placeholder="${history[index].toX}" onchange="radius=value"/></label><br/>
-                        <label for="colorR">Color<input id="colorR" type="color" value="color" placeholder="${history[index].color}" onchange="colorR=value"/></label><br/>
-                        <label for="fill">fill<input id="fill" type="checkbox" value="fill" placeholder="${history[index].width}" onchange="fill=value"/></label><br/>
-                        </form>`;
-        document.getElementById('history').innerHTML += form;
+        document.getElementById('history').innerHTML += getCircleEditor(index);
     }
+}
+
+function changeSelection(item, selectR) {
+    selectedShape = selectR;
+    selectedItem = item;
+    redraw()
 }
 
 function handleMouseMove(e) {
@@ -305,7 +278,7 @@ function handleMouseMove(e) {
                     selectedItem.toY += offsetY;
                     startX = endX;
                     startY = endY;
-                    selectedShape = new SelectRect(selectedItem.x, selectedItem.y, selectedItem.toX, selectedItem.toY);
+                    changeSelection(selectedItem, new SelectRect(selectedItem.x, selectedItem.y, selectedItem.toX, selectedItem.toY));
                     break;
             }
         }
@@ -336,7 +309,7 @@ function handleMouseMove(e) {
                     selectedItem.move(offsetX, offsetY);
                     startX = endX;
                     startY = endY;
-                    selectedShape = new SelectRect(selectedItem.x, selectedItem.y, selectedItem.toX, selectedItem.toY);
+                    changeSelection(selectedItem, new SelectRect(selectedItem.x, selectedItem.y, selectedItem.toX, selectedItem.toY));
                     break;
             }
         }
@@ -512,7 +485,6 @@ function drawCircle(context, x, y, radius, color, fill = false) {
 }
 
 function drawEllipse(context, x, y, toX, toY, color, fill = false) {
-    console.log(fill);
     context.beginPath();
     context.ellipse(x + (toX - x) / 2, y + (toY - y) / 2, Math.abs((toX - x) / 2), Math.abs((toY - y) / 2), 0, 0, Math.PI * 2, false);
     if (!fill) {
@@ -640,7 +612,7 @@ function rgbOf(color) {
     let r = parseInt(color.slice(1, 3), 16),
         g = parseInt(color.slice(3, 5), 16),
         b = parseInt(color.slice(5, 7), 16);
-    return { r: r, g: g, b: b };
+    return {r: r, g: g, b: b};
 }
 
 /**
@@ -655,7 +627,7 @@ function changeCurrentShape(option) {
     startX = undefined;
     startY = undefined;
     if (selectedOption !== "selector") {
-        selectedShape = undefined;
+        changeSelection(undefined, undefined);
         currentHandle = undefined;
         redraw();
     }
@@ -697,6 +669,9 @@ h.addEventListener('click', (ev) => {
         } else if (button.id === 't') {
             changeInfo('text', parseInt(button.value));
         }
+        let item=history[parseInt(button.value)];
+        changeSelection(item,new SelectRect(item.x,item.y,item.toX,item.toY));
+        changeCurrentShape("selector");
     });
 });
 
@@ -714,7 +689,7 @@ function save() {
     req.open("POST", `http://localhost:4747/projects/${projectId}`, true);
     req.setRequestHeader('Content-Type', 'application/json');
     req.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('ecaw-jwt'));
-    req.onreadystatechange = function() {
+    req.onreadystatechange = function () {
         if (req.readyState === XMLHttpRequest.DONE) {
             if (req.status === 200) {
                 let response = JSON.parse(req.responseText);
@@ -742,13 +717,13 @@ function updateServerCanvas(canvasType) {
         canvasToSave = canvasBack;
         fileName = "canvas-back.png";
     }
-    canvasToSave.toBlob(function(blob) {
+    canvasToSave.toBlob(function (blob) {
         let req = new XMLHttpRequest();
         let formData = new FormData();
         formData.append("canvas", blob, fileName);
         req.open("POST", `http://localhost:4747/projects/photo/${projectId}`, true);
         req.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('ecaw-jwt'));
-        req.onreadystatechange = function() {
+        req.onreadystatechange = function () {
             if (req.readyState === XMLHttpRequest.DONE) {
                 if (req.status === 200) {
                     console.log(req.responseText);
@@ -763,7 +738,7 @@ function updateServerCanvas(canvasType) {
 
 function restore() {
     let img = new Image();
-    img.onload = function() {
+    img.onload = function () {
         ghostContext.drawImage(img, 0, 0);
         redraw();
     };
@@ -775,7 +750,7 @@ function restore() {
     console.log(`http://localhost:4747/projects/${projectId}`);
     req.open("GET", `http://localhost:4747/projects/${projectId}`, true);
     req.setRequestHeader('Content-Type', 'application/json');
-    req.onreadystatechange = function() {
+    req.onreadystatechange = function () {
         if (req.readyState === XMLHttpRequest.DONE) {
             if (req.status === 200) {
                 let components = JSON.parse(req.responseText);

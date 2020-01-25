@@ -13,8 +13,6 @@ class Rectangle {
     }
 }
 
-//TODO: Add text
-
 //todo: add image on canvas
 
 //todo: keyboard shortcuts
