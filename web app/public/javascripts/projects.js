@@ -165,6 +165,20 @@ function handleMouseDown(e) {
     redraw();
 }
 
+function createHistoryButton(type){
+    let newOb = document.createElement('button');
+    let capitalizedName = type.charAt(0).toUpperCase() + type.slice(1);
+    newOb.innerHTML = `${capitalizedName} ${nbR}`;
+    newOb.value = `${history.length - 1}`;
+    newOb.addEventListener('click', (e) => {
+        //changeInfo(type, parseInt(`${history.length - 1}`));
+        let item = history[e.target.value];
+        changeSelection(item, new SelectRect(item.x, item.y, item.toX, item.toY));
+        changeCurrentShape("selector");
+    });
+    document.getElementById('history').appendChild(newOb);
+}
+
 function handleMouseUp(e) {
     e.preventDefault();
     e.stopPropagation();
@@ -174,23 +188,19 @@ function handleMouseUp(e) {
         if (selectedOption === "rectangle" && endX !== undefined) {
             history.push(new Rectangle(startX, startY, endX, endY, color, fill));
             nbR++;
-            const newOb = `<button id="r" value="${history.length - 1}">Rectangle ${nbR}</button><br>`;
-            document.getElementById('history').innerHTML += newOb;
+            createHistoryButton('rectangle')
         } else if (selectedOption === "line" && endX !== undefined) {
             history.push(new Line(startX, startY, endX, endY, color));
             nbL++;
-            const newOb = `<button id="l" value="${history.length - 1}">Line ${nbL}</button><br>`;
-            document.getElementById('history').innerHTML += newOb;
+            createHistoryButton('line')
         } else if (selectedOption === "ellipse" && endX !== undefined) {
             history.push(new Ellipse(startX, startY, endX, endY, color, fill));
             nbE++;
-            const newOb = `<button id="e" value="${history.length - 1}">Ellipse ${nbE}</button><br>`;
-            document.getElementById('history').innerHTML += newOb;
+            createHistoryButton('ellipse')
         } else if (selectedOption === "circle" && endX !== undefined) {
             history.push(new Circle(startX, startY, 50, color, fill));
             nbC++;
-            const newOb = `<button id="c" value="${history.length - 1}">Circle ${nbC}</button><br>`;
-            document.getElementById('history').innerHTML += newOb;
+            createHistoryButton('circle');
             redraw();
         }
     }
@@ -661,28 +671,6 @@ canvas.addEventListener('mouseup', (e) => {
 });
 canvas.addEventListener('mousemove', (e) => {
     handleMouseMove(e);
-});
-
-let h = document.getElementById('history');
-h.addEventListener('click', (ev) => {
-    let button = h.querySelector('button');
-
-    button.addEventListener('click', (ev) => {
-        if (button.id === 'r') {
-            changeInfo('rectangle', parseInt(button.value));
-        } else if (button.id === 'l') {
-            changeInfo('line', parseInt(button.value));
-        } else if (button.id === 'e') {
-            changeInfo('ellipse', parseInt(button.value));
-        } else if (button.id === 'c') {
-            changeInfo('circle', parseInt(button.value));
-        } else if (button.id === 't') {
-            changeInfo('text', parseInt(button.value));
-        }
-        let item = history[parseInt(button.value)];
-        changeSelection(item, new SelectRect(item.x, item.y, item.toX, item.toY));
-        changeCurrentShape("selector");
-    });
 });
 
 /**
