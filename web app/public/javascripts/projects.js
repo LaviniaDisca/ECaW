@@ -202,19 +202,104 @@ function handleMouseUp(e) {
 function changeInfo(shape, index) {
     if (shape === 'rectangle') {
         document.getElementById('history').innerHTML += getRectangleEditor(index);
-        //todo: here add event listeners on all fields
-        /*
-        Example:
-        document.getElementById("editor-x-value").addEventListener('change', (e) => {
-            selectedItem.x = e.value;//i guess
-            changeSelection(selectedItem,new SelectRect(selectedItem.x,selectedItem.y,selectedItem.toX,selectedItem.toY))
-        })*/
+        document.getElementById("x").addEventListener('change', (e) => {
+            selectedItem.x = e.value;
+            changeSelection(selectedItem, new SelectRect(selectedItem.x, selectedItem.y, selectedItem.toX, selectedItem.toY))
+        });
+        document.getElementById("y").addEventListener('change', (e) => {
+            selectedItem.y = e.value;
+            changeSelection(selectedItem, new SelectRect(selectedItem.x, selectedItem.y, selectedItem.toX, selectedItem.toY))
+        });
+        document.getElementById("toX").addEventListener('change', (e) => {
+            selectedItem.toX = e.value;
+            changeSelection(selectedItem, new SelectRect(selectedItem.x, selectedItem.y, selectedItem.toX, selectedItem.toY))
+        });
+        document.getElementById("toY").addEventListener('change', (e) => {
+            selectedItem.toY = e.value;
+            changeSelection(selectedItem, new SelectRect(selectedItem.x, selectedItem.y, selectedItem.toX, selectedItem.toY))
+        });
+        document.getElementById("width").addEventListener('change', (e) => {
+            selectedItem.width = e.value;
+            changeSelection(selectedItem, new SelectRect(selectedItem.x, selectedItem.y, selectedItem.toX, selectedItem.toY))
+        });
+        document.getElementById("height").addEventListener('change', (e) => {
+            selectedItem.height = e.value;
+            changeSelection(selectedItem, new SelectRect(selectedItem.x, selectedItem.y, selectedItem.toX, selectedItem.toY))
+        });
+        document.getElementById("colorR").addEventListener('change', (e) => {
+            selectedItem.color = e.value;
+            changeSelection(selectedItem, new SelectRect(selectedItem.x, selectedItem.y, selectedItem.toX, selectedItem.toY))
+        });
     } else if (shape === 'line') {
         document.getElementById('history').innerHTML += getLineEditor(index);
+        document.getElementById("x").addEventListener('change', (e) => {
+            selectedItem.x = e.value;
+            changeSelection(selectedItem, new SelectRect(selectedItem.x, selectedItem.y, selectedItem.toX, selectedItem.toY))
+        });
+        document.getElementById("y").addEventListener('change', (e) => {
+            selectedItem.y = e.value;
+            changeSelection(selectedItem, new SelectRect(selectedItem.x, selectedItem.y, selectedItem.toX, selectedItem.toY))
+        });
+        document.getElementById("toX").addEventListener('change', (e) => {
+            selectedItem.toX = e.value;
+            changeSelection(selectedItem, new SelectRect(selectedItem.x, selectedItem.y, selectedItem.toX, selectedItem.toY))
+        });
+        document.getElementById("toY").addEventListener('change', (e) => {
+            selectedItem.toY = e.value;
+            changeSelection(selectedItem, new SelectRect(selectedItem.x, selectedItem.y, selectedItem.toX, selectedItem.toY))
+        });
+        document.getElementById("colorL").addEventListener('change', (e) => {
+            selectedItem.color = e.value;
+            changeSelection(selectedItem, new SelectRect(selectedItem.x, selectedItem.y, selectedItem.toX, selectedItem.toY))
+        });
     } else if (shape === 'ellipse') {
         document.getElementById('history').innerHTML += getEllipseEditor(index);
+        document.getElementById("x").addEventListener('change', (e) => {
+            selectedItem.x = e.value;
+            changeSelection(selectedItem, new SelectRect(selectedItem.x, selectedItem.y, selectedItem.toX, selectedItem.toY))
+        });
+        document.getElementById("y").addEventListener('change', (e) => {
+            selectedItem.y = e.value;
+            changeSelection(selectedItem, new SelectRect(selectedItem.x, selectedItem.y, selectedItem.toX, selectedItem.toY))
+        });
+        document.getElementById("toX").addEventListener('change', (e) => {
+            selectedItem.toX = e.value;
+            changeSelection(selectedItem, new SelectRect(selectedItem.x, selectedItem.y, selectedItem.toX, selectedItem.toY))
+        });
+        document.getElementById("toY").addEventListener('change', (e) => {
+            selectedItem.toY = e.value;
+            changeSelection(selectedItem, new SelectRect(selectedItem.x, selectedItem.y, selectedItem.toX, selectedItem.toY))
+        });
+        document.getElementById("colorE").addEventListener('change', (e) => {
+            selectedItem.color = e.value;
+            changeSelection(selectedItem, new SelectRect(selectedItem.x, selectedItem.y, selectedItem.toX, selectedItem.toY))
+        });
+        document.getElementById("fill").addEventListener('change', (e) => {
+            selectedItem.fill = e.value;
+            changeSelection(selectedItem, new SelectRect(selectedItem.x, selectedItem.y, selectedItem.toX, selectedItem.toY))
+        });
     } else if (shape === 'circle') {
         document.getElementById('history').innerHTML += getCircleEditor(index);
+        document.getElementById("centerX").addEventListener('change', (e) => {
+            selectedItem.centerX = e.value;
+            changeSelection(selectedItem, new SelectRect(selectedItem.x, selectedItem.y, selectedItem.toX, selectedItem.toY))
+        });
+        document.getElementById("centerY").addEventListener('change', (e) => {
+            selectedItem.centerY = e.value;
+            changeSelection(selectedItem, new SelectRect(selectedItem.x, selectedItem.y, selectedItem.toX, selectedItem.toY))
+        });
+        document.getElementById("radius").addEventListener('change', (e) => {
+            selectedItem.radius = e.value;
+            changeSelection(selectedItem, new SelectRect(selectedItem.x, selectedItem.y, selectedItem.toX, selectedItem.toY))
+        });
+        document.getElementById("colorC").addEventListener('change', (e) => {
+            selectedItem.color = e.value;
+            changeSelection(selectedItem, new SelectRect(selectedItem.x, selectedItem.y, selectedItem.toX, selectedItem.toY))
+        });
+        document.getElementById("fill").addEventListener('change', (e) => {
+            selectedItem.fill = e.value;
+            changeSelection(selectedItem, new SelectRect(selectedItem.x, selectedItem.y, selectedItem.toX, selectedItem.toY))
+        });
     }
 }
 
@@ -665,7 +750,7 @@ canvas.addEventListener('mousemove', (e) => {
 
 let h = document.getElementById('history');
 h.addEventListener('click', (ev) => {
-    let button = h.querySelector('button');
+    let button = h.querySelectorAll('button');
 
     button.addEventListener('click', (ev) => {
         if (button.id === 'r') {
