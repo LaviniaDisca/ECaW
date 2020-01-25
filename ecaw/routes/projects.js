@@ -5,13 +5,22 @@ const databaseURL = require('../app');
 let jwtChecker = require('../jwt');
 let photo = require('../multer');
 let path = require('path');
+let fs = require('fs');
+
+
+let createFolder = function (req, res, next) {
+    let filePath = `../uploads/${req.decoded.username}/${parseInt(req.params.projectId)}`;
+    if (!fs.existsSync(path.join(__dirname, filePath))) {
+        fs.mkdirSync(path.join(__dirname, filePath), {recursive: true});
+    }
+    next();
+};
 
 router.get('/photo/:username/:projectId/:canvas', function (req, res, next) {
-    //res.send(path.join(__dirname, `../uploads/${req.params.username}/${parseInt(req.params.projectId)}/${req.params.canvas}.png`))
     res.sendFile(path.join(__dirname, `../uploads/${req.params.username}/${parseInt(req.params.projectId)}/${req.params.canvas}.png`));
 });
 
-router.post('/photo/:projectId', jwtChecker.verifyToken, jwtChecker.validateToken, photo.upload, function (req, res) {
+router.post('/photo/:projectId', jwtChecker.verifyToken, jwtChecker.validateToken, createFolder, photo.upload, function (req, res) {
     res.send({
         success: true,
         message: "Canvas updated successfully"
@@ -19,7 +28,7 @@ router.post('/photo/:projectId', jwtChecker.verifyToken, jwtChecker.validateToke
 });
 
 //all projects owned by the user provided in the JWT
-router.get('/', jwtChecker.verifyToken, jwtChecker.validateToken, function (req, res, next) {
+router.get('/', jwtChecker.verifyToken, jwtChecker.validateToken, function (req, res) {
     mongoDB.connect(databaseURL.databaseURL, function (err, client) {
         if (err) throw err;
         let db = client.db('ecaw');
@@ -95,7 +104,7 @@ router.post('/:projectId', jwtChecker.verifyToken, jwtChecker.validateToken, fun
     });
 });
 
-router.delete('/:projectId', function (req, res, next) {
+router.delete('/:projectId', function (req, res) {
     mongoDB.connect(databaseURL.databaseURL, function (err, client) {
         if (err) throw err;
         let db = client.db('ecaw');

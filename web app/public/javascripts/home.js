@@ -10,10 +10,9 @@ let currentHandle = undefined;
 let fill = false;
 let selectedItem = undefined;
 let enterCoords = [];
-
-
 let token = localStorage.getItem("ecaw-jwt");
 
+console.log(projectId);
 //redirect if the user isn't logged in
 if (!token) {
     window.location.href = "/";
@@ -632,7 +631,7 @@ function asd() {
 
 function save() {
     let req = new XMLHttpRequest();
-    req.open("POST", "http://localhost:4747/projects/6", true);
+    req.open("POST", `http://localhost:4747/projects/${projectId}`, true);
     req.setRequestHeader('Content-Type', 'application/json');
     req.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('ecaw-jwt'));
     req.onreadystatechange = function () {
@@ -650,7 +649,7 @@ function save() {
             }
         }
     };
-    req.send(JSON.stringify(new ServerData(history, localStorage.getItem('ecaw-username'), 6)));
+    req.send(JSON.stringify(new ServerData(history, localStorage.getItem('ecaw-username'), parseInt(projectId))));
 }
 
 function updateServerCanvas(canvasType) {
@@ -667,7 +666,7 @@ function updateServerCanvas(canvasType) {
         let req = new XMLHttpRequest();
         let formData = new FormData();
         formData.append("canvas", blob, fileName);
-        req.open("POST", "http://localhost:4747/projects/photo/6", true);
+        req.open("POST", `http://localhost:4747/projects/photo/${projectId}`, true);
         req.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('ecaw-jwt'));
         req.onreadystatechange = function () {
             if (req.readyState === XMLHttpRequest.DONE) {
@@ -690,10 +689,11 @@ function restore() {
     };
     //without cross-origin the next save will always fail
     img.crossOrigin = "Anonymous";
-    img.src = "http://localhost:4747/projects/photo/admin/6/canvas-back";
+    img.src = `http://localhost:4747/projects/photo/${localStorage.getItem('ecaw-username')}/${projectId}/canvas-back`;
 
     let req = new XMLHttpRequest();
-    req.open("GET", "http://localhost:4747/projects/6", true);
+    console.log(`http://localhost:4747/projects/${projectId}`);
+    req.open("GET", `http://localhost:4747/projects/${projectId}`, true);
     req.setRequestHeader('Content-Type', 'application/json');
     req.onreadystatechange = function () {
         if (req.readyState === XMLHttpRequest.DONE) {

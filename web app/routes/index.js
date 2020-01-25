@@ -15,7 +15,7 @@ router.get('/register', function (req, res) {
 });
 
 router.get('/home', function (req, res) {
-    res.render('home');
+    res.render('home', {projectId: req.query.projectId});
 });
 
 module.exports = router;
