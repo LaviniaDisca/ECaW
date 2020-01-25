@@ -165,6 +165,20 @@ function handleMouseDown(e) {
     redraw();
 }
 
+function createHistoryButton(type) {
+    let newOb = document.createElement('button');
+    let capitalizedName = type.charAt(0).toUpperCase() + type.slice(1);
+    newOb.innerHTML = `${capitalizedName} ${nbR}`;
+    newOb.value = `${history.length - 1}`;
+    newOb.addEventListener('click', (e) => {
+        //changeInfo(type, parseInt(`${history.length - 1}`));
+        let item = history[e.target.value];
+        changeSelection(item, new SelectRect(item.x, item.y, item.toX, item.toY));
+        changeCurrentShape("selector");
+    });
+    document.getElementById('history').appendChild(newOb);
+}
+
 function handleMouseUp(e) {
     e.preventDefault();
     e.stopPropagation();
@@ -174,23 +188,19 @@ function handleMouseUp(e) {
         if (selectedOption === "rectangle" && endX !== undefined) {
             history.push(new Rectangle(startX, startY, endX, endY, color, fill));
             nbR++;
-            const newOb = `<button id="r" value="${history.length - 1}">Rectangle ${nbR}</button><br>`;
-            document.getElementById('history').innerHTML += newOb;
+            createHistoryButton('rectangle')
         } else if (selectedOption === "line" && endX !== undefined) {
             history.push(new Line(startX, startY, endX, endY, color));
             nbL++;
-            const newOb = `<button id="l" value="${history.length - 1}">Line ${nbL}</button><br>`;
-            document.getElementById('history').innerHTML += newOb;
+            createHistoryButton('line')
         } else if (selectedOption === "ellipse" && endX !== undefined) {
             history.push(new Ellipse(startX, startY, endX, endY, color, fill));
             nbE++;
-            const newOb = `<button id="e" value="${history.length - 1}">Ellipse ${nbE}</button><br>`;
-            document.getElementById('history').innerHTML += newOb;
+            createHistoryButton('ellipse')
         } else if (selectedOption === "circle" && endX !== undefined) {
             history.push(new Circle(startX, startY, 50, color, fill));
             nbC++;
-            const newOb = `<button id="c" value="${history.length - 1}">Circle ${nbC}</button><br>`;
-            document.getElementById('history').innerHTML += newOb;
+            createHistoryButton('circle');
             redraw();
         }
     }
@@ -707,7 +717,7 @@ function rgbOf(color) {
     let r = parseInt(color.slice(1, 3), 16),
         g = parseInt(color.slice(3, 5), 16),
         b = parseInt(color.slice(5, 7), 16);
-    return {r: r, g: g, b: b};
+    return { r: r, g: g, b: b };
 }
 
 /**
@@ -748,28 +758,6 @@ canvas.addEventListener('mousemove', (e) => {
     handleMouseMove(e);
 });
 
-let h = document.getElementById('history');
-h.addEventListener('click', (ev) => {
-    let button = h.querySelectorAll('button');
-
-    button.addEventListener('click', (ev) => {
-        if (button.id === 'r') {
-            changeInfo('rectangle', parseInt(button.value));
-        } else if (button.id === 'l') {
-            changeInfo('line', parseInt(button.value));
-        } else if (button.id === 'e') {
-            changeInfo('ellipse', parseInt(button.value));
-        } else if (button.id === 'c') {
-            changeInfo('circle', parseInt(button.value));
-        } else if (button.id === 't') {
-            changeInfo('text', parseInt(button.value));
-        }
-        let item = history[parseInt(button.value)];
-        changeSelection(item, new SelectRect(item.x, item.y, item.toX, item.toY));
-        changeCurrentShape("selector");
-    });
-});
-
 /**
  * Downloads the ghost canvas locally
  * Used for debugging
@@ -784,7 +772,7 @@ function save() {
     req.open("POST", `http://localhost:4747/projects/${projectId}`, true);
     req.setRequestHeader('Content-Type', 'application/json');
     req.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('ecaw-jwt'));
-    req.onreadystatechange = function () {
+    req.onreadystatechange = function() {
         if (req.readyState === XMLHttpRequest.DONE) {
             if (req.status === 200) {
                 let response = JSON.parse(req.responseText);
@@ -812,13 +800,13 @@ function updateServerCanvas(canvasType) {
         canvasToSave = canvasBack;
         fileName = "canvas-back.png";
     }
-    canvasToSave.toBlob(function (blob) {
+    canvasToSave.toBlob(function(blob) {
         let req = new XMLHttpRequest();
         let formData = new FormData();
         formData.append("canvas", blob, fileName);
         req.open("POST", `http://localhost:4747/projects/photo/${projectId}`, true);
         req.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('ecaw-jwt'));
-        req.onreadystatechange = function () {
+        req.onreadystatechange = function() {
             if (req.readyState === XMLHttpRequest.DONE) {
                 if (req.status === 200) {
                     console.log(req.responseText);
@@ -833,7 +821,7 @@ function updateServerCanvas(canvasType) {
 
 function restore() {
     let img = new Image();
-    img.onload = function () {
+    img.onload = function() {
         ghostContext.drawImage(img, 0, 0);
         redraw();
     };
@@ -845,7 +833,7 @@ function restore() {
     console.log(`http://localhost:4747/projects/${projectId}`);
     req.open("GET", `http://localhost:4747/projects/${projectId}`, true);
     req.setRequestHeader('Content-Type', 'application/json');
-    req.onreadystatechange = function () {
+    req.onreadystatechange = function() {
         if (req.readyState === XMLHttpRequest.DONE) {
             if (req.status === 200) {
                 let components = JSON.parse(req.responseText);
