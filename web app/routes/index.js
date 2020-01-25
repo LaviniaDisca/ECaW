@@ -14,12 +14,12 @@ router.get('/register', function (req, res) {
     res.render('register');
 });
 
-router.get('/projects', function (req, res) {
-    res.render('projects');
+router.get('/home', function (req, res) {
+    res.render('home');
 });
 
-router.get('/home', function (req, res) {
-    res.render('home', {projectId: req.query.projectId});
+router.get('/projects', function (req, res) {
+    res.render('projects', {projectId: req.query.projectId});
 });
 
 module.exports = router;
