@@ -4,15 +4,18 @@ let mongoDB = require('mongodb').MongoClient;
 const databaseURL = require('../app');
 let jwtChecker = require('../jwt');
 let photo = require('../multer');
-let path=require('path');
+let path = require('path');
 
-router.get('/home', function (req, res, next) {
-    res.sendFile(path.join(__dirname, '../uploads/canvas.png'));
+router.get('/photo/:username/:projectId/:canvas', function (req, res, next) {
+    //res.send(path.join(__dirname, `../uploads/${req.params.username}/${parseInt(req.params.projectId)}/${req.params.canvas}.png`))
+    res.sendFile(path.join(__dirname, `../uploads/${req.params.username}/${parseInt(req.params.projectId)}/${req.params.canvas}.png`));
 });
 
-router.post('/home', photo.upload, function (req, res) {
-    console.log(req.body.serverDatais);
-    res.send({job: "done"});
+router.post('/photo/:projectId', jwtChecker.verifyToken, jwtChecker.validateToken, photo.upload, function (req, res) {
+    res.send({
+        success: true,
+        message: "Canvas updated successfully"
+    });
 });
 
 //all projects owned by the user provided in the JWT
@@ -90,6 +93,21 @@ router.post('/:projectId', jwtChecker.verifyToken, jwtChecker.validateToken, fun
             }
         });
     });
+});
+
+router.delete('/:projectId', function (req, res, next) {
+    mongoDB.connect(databaseURL.databaseURL, function (err, client) {
+        if (err) throw err;
+        let db = client.db('ecaw');
+
+        db.collection('projects').remove({_id: parseInt(req.params.projectId)}, function (err, result) {
+            if (err) throw err;
+            res.send({
+                success: true,
+                message: "Project deleted"
+            })
+        })
+    })
 });
 
 module.exports = router;

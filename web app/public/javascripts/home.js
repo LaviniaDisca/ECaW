@@ -476,7 +476,8 @@ function drawEllipse(context, x, y, toX, toY, color, fill = false) {
 function floodFill(startX, startY, startR, startG, startB, color) {
     let found = false;
     history.slice().reverse().forEach((item) => {
-        if (!found && cursorInShape(startX, startY, item)) {
+        if (!(item instanceof Line) && !found && cursorInShape(startX, startY, item)) {
+            item.color = color;
             item.fill = true;
             found = true;
         }
@@ -630,33 +631,50 @@ function asd() {
 }
 
 function save() {
-    canvas.toBlob(function (blob) {
-        var newImg = document.createElement('img'),
-            url = URL.createObjectURL(blob);
+    let req = new XMLHttpRequest();
+    req.open("POST", "http://localhost:4747/projects/6", true);
+    req.setRequestHeader('Content-Type', 'application/json');
+    req.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('ecaw-jwt'));
+    req.onreadystatechange = function () {
+        if (req.readyState === XMLHttpRequest.DONE) {
+            if (req.status === 200) {
+                let response = JSON.parse(req.responseText);
+                if (response.success) {
+                    //this will be the thumbnail for the project
+                    updateServerCanvas("front");
+                    //this will save the flood fills
+                    updateServerCanvas("back");
+                }
+            } else if (req.status === 401) {
+                console.log("error");
+            }
+        }
+    };
+    req.send(JSON.stringify(new ServerData(history, localStorage.getItem('ecaw-username'), 6)));
+}
 
-        newImg.onload = function () {
-            // no longer need to read the blob so it's revoked
-            URL.revokeObjectURL(url);
-        };
-
+function updateServerCanvas(canvasType) {
+    let canvasToSave;
+    let fileName;
+    if (canvasType === "front") {
+        canvasToSave = canvas;
+        fileName = "canvas.png";
+    } else if (canvasType === "back") {
+        canvasToSave = canvasBack;
+        fileName = "canvas-back.png";
+    }
+    canvasToSave.toBlob(function (blob) {
         let req = new XMLHttpRequest();
         let formData = new FormData();
-        formData.append("canvas", blob, "canvas.png");
-        formData.append("serverDatais",JSON.stringify(new ServerData(history, "asd", 6)))
-        //todo: change endpoint
-        req.open("POST", "http://localhost:4747/projects/home", true);
+        formData.append("canvas", blob, fileName);
+        req.open("POST", "http://localhost:4747/projects/photo/6", true);
+        req.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('ecaw-jwt'));
         req.onreadystatechange = function () {
             if (req.readyState === XMLHttpRequest.DONE) {
                 if (req.status === 200) {
-                    let result = JSON.parse(req.responseText);
-                    if (result.success) {
-                        token = result.token;
-                    } else {
-                        //todo:show error message
-                        console.log("Login failed");
-                    }
-                } else if (req.status === 401) {
-                    console.log("error");
+                    console.log(req.responseText);
+                } else {
+                    console.log(req.responseText);
                 }
             }
         };
@@ -665,21 +683,26 @@ function save() {
 }
 
 function restore() {
-    /*let img=new Image();
-    img.onload=function () {
-        context.drawImage(img,0,0);
+    let img = new Image();
+    img.onload = function () {
+        ghostContext.drawImage(img, 0, 0);
+        redraw();
     };
-    img.src="http://localhost:4747/projects/home";*/
+    //without cross-origin the next save will always fail
+    img.crossOrigin = "Anonymous";
+    img.src = "http://localhost:4747/projects/photo/admin/6/canvas-back";
 
     let req = new XMLHttpRequest();
-    req.open("GET", "http://localhost:4747/projects", true);
+    req.open("GET", "http://localhost:4747/projects/6", true);
     req.setRequestHeader('Content-Type', 'application/json');
-    req.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('ecaw-jwt'));
-    req.onreadystatechange = function() {
+    req.onreadystatechange = function () {
         if (req.readyState === XMLHttpRequest.DONE) {
             if (req.status === 200) {
                 let components = JSON.parse(req.responseText);
-                console.log(components);
+                let serverData = new ServerData();
+                serverData.restore(components);
+                history = serverData.toHistoryArray();
+                redraw();
             } else if (req.status === 401) {
                 console.log("error");
             }
