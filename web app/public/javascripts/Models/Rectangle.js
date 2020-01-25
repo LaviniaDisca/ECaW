@@ -1,5 +1,6 @@
 class Rectangle {
-    index=0;
+    index = 0;
+
     constructor(x, y, toX, toY, color, fill) {
         this.x = x;
         this.y = y;

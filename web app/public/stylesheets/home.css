@@ -5,6 +5,9 @@ canvas {
     cursor: crosshair;
 }
 
+form{
+    color: white;
+}
 .history {
     top: 6%;
     position: absolute;
@@ -21,7 +24,7 @@ canvas {
     position: absolute;
     right: 0;
     background-color: #333;
-    overflow: auto;
+    overflow: hidden;
     width: 20%;
     white-space: nowrap;
 }

@@ -8,7 +8,7 @@ let currentHandle = undefined;
 let fill = false;
 let selectedItem = undefined;
 let currentText = undefined;
-
+let nbR = 0, nbC = 0, nbE = 0, nbT = 0, nbL = 0;
 let token = localStorage.getItem("ecaw-jwt");
 
 //redirect if the user isn't logged in
@@ -127,6 +127,9 @@ function handleMouseDown(e) {
     if (selectedOption === 'text') {
         currentText = new TextInput(e.offsetX, startY, []);
         history.push(currentText);
+        nbT++;
+        const newOb = `<button id="t" value="${history.length - 1}">Text ${nbT}</button><br>`;
+        document.getElementById('history').innerHTML += newOb;
     }
     if (selectedOption === "selector") {
         // if the mouse is over a handle don't try to search for another shape
@@ -167,19 +170,73 @@ function handleMouseUp(e) {
         //the drawing "animation" is over so we push the resulting shape into the history
         if (selectedOption === "rectangle" && endX !== undefined) {
             history.push(new Rectangle(startX, startY, endX, endY, color, fill));
+            nbR++;
+            const newOb = `<button id="r" value="${history.length - 1}">Rectangle ${nbR}</button><br>`;
+            document.getElementById('history').innerHTML += newOb;
         } else if (selectedOption === "line" && endX !== undefined) {
             history.push(new Line(startX, startY, endX, endY, color));
+            nbL++;
+            const newOb = `<button id="l" value="${history.length - 1}">Line ${nbL}</button><br>`;
+            document.getElementById('history').innerHTML += newOb;
         } else if (selectedOption === "ellipse" && endX !== undefined) {
             history.push(new Ellipse(startX, startY, endX, endY, color, fill));
+            nbE++;
+            const newOb = `<button id="e" value="${history.length - 1}">Ellipse ${nbE}</button><br>`;
+            document.getElementById('history').innerHTML += newOb;
         } else if (selectedOption === "circle" && endX !== undefined) {
             history.push(new Circle(startX, startY, 50, color, fill));
+            nbC++;
+            const newOb = `<button id="c" value="${history.length - 1}">Circle ${nbC}</button><br>`;
+            document.getElementById('history').innerHTML += newOb;
             redraw();
         }
     }
     endX = undefined;
     endY = undefined;
     console.log(history);
+}
 
+function changeInfo(shape, index) {
+    if (shape === 'rectangle') {
+        let form = `<form id="rInfo">
+                        <label for="x">x coord<input id="x" type="number" value="x" placeholder="${history[index].x}" onchange="x=value"/></label><br/>
+                        <label for="y">y coord<input id="y" type="number" value="y" placeholder="${history[index].y}" onchange="y=value"/></label><br/>
+                        <label for="toX">toX coord<input id="toX" type="number" value="toX" placeholder="${history[index].toX}" onchange="toX=value"/></label><br/>
+                        <label for="toY">toY coord<input id="toY" type="number" value="toY" placeholder="${history[index].toY}" onchange="toY=value"/></label><br/>
+                        <label for="width">width<input id="width" type="number" value="width" placeholder="${history[index].width}" onchange="width=value"/></label><br/>
+                        <label for="height">height<input id="height" type="number" value="height" placeholder="${history[index].height}" onchange="height=value"/></label><br/>
+                        <label for="colorR">Color<input id="colorR" type="color" value="color" placeholder="${history[index].color}" onchange="colorR=value"/></label><br/>
+                        </form>`;
+        document.getElementById('history').innerHTML += form;
+    } else if (shape === 'line') {
+        let form = `<form id="lInfo">
+                        <label for="x">x coord<input id="x" type="number" value="x" placeholder="${history[index].x}" onchange="x=value"/></label><br/>
+                        <label for="y">y coord<input id="y" type="number" value="y" placeholder="${history[index].y}" onchange="y=value"/></label><br/>
+                        <label for="toX">toX coord<input id="toX" type="number" value="toX" placeholder="${history[index].toX}" onchange="toX=value"/></label><br/>
+                        <label for="toY">toY coord<input id="toY" type="number" value="toY" placeholder="${history[index].toY}" onchange="toY=value"/></label><br/>
+                        <label for="colorR">Color<input id="colorR" type="color" value="color" placeholder="${history[index].color}" onchange="colorR=value"/></label><br/>
+                        </form>`;
+        document.getElementById('history').innerHTML += form;
+    } else if (shape === 'ellipse') {
+        let form = `<form id="eInfo">
+                        <label for="x">x coord<input id="x" type="number" value="x" placeholder="${history[index].x}" onchange="x=value"/></label><br/>
+                        <label for="y">y coord<input id="y" type="number" value="y" placeholder="${history[index].y}" onchange="y=value"/></label><br/>
+                        <label for="toX">toX coord<input id="toX" type="number" value="toX" placeholder="${history[index].toX}" onchange="toX=value"/></label><br/>
+                        <label for="toY">toY coord<input id="toY" type="number" value="toY" placeholder="${history[index].toY}" onchange="toY=value"/></label><br/>
+                        <label for="colorR">Color<input id="colorR" type="color" value="color" placeholder="${history[index].color}" onchange="colorR=value"/></label><br/>
+                        <label for="fill">fill<input id="fill" type="checkbox" value="fill" placeholder="${history[index].width}" onchange="fill=value"/></label><br/>
+                        </form>`;
+        document.getElementById('history').innerHTML += form;
+    } else if (shape === 'circle') {
+        let form = `<form id="cInfo">
+                        <label for="centerX">centerX coord<input id="centerX" type="number" value="centerX" placeholder="${history[index].x}" onchange="centerX=value"/></label><br/>
+                        <label for="centerY">centerY coord<input id="centerY" type="number" value="centerY" placeholder="${history[index].y}" onchange="centerY=value"/></label><br/>
+                        <label for="radius">radius coord<input id="radius" type="number" value="radius" placeholder="${history[index].toX}" onchange="radius=value"/></label><br/>
+                        <label for="colorR">Color<input id="colorR" type="color" value="color" placeholder="${history[index].color}" onchange="colorR=value"/></label><br/>
+                        <label for="fill">fill<input id="fill" type="checkbox" value="fill" placeholder="${history[index].width}" onchange="fill=value"/></label><br/>
+                        </form>`;
+        document.getElementById('history').innerHTML += form;
+    }
 }
 
 function handleMouseMove(e) {
@@ -616,6 +673,25 @@ canvas.addEventListener('mouseup', (e) => {
 });
 canvas.addEventListener('mousemove', (e) => {
     handleMouseMove(e);
+});
+
+let h = document.getElementById('history');
+h.addEventListener('click', (ev) => {
+    let button = h.querySelector('button');
+
+    button.addEventListener('click', (ev) => {
+        if (button.id === 'r') {
+            changeInfo('rectangle', parseInt(button.value));
+        } else if (button.id === 'l') {
+            changeInfo('line', parseInt(button.value));
+        } else if (button.id === 'e') {
+            changeInfo('ellipse', parseInt(button.value));
+        } else if (button.id === 'c') {
+            changeInfo('circle', parseInt(button.value));
+        } else if (button.id === 't') {
+            changeInfo('text', parseInt(button.value));
+        }
+    });
 });
 
 /**

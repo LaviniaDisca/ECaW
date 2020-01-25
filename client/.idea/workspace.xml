@@ -4,6 +4,8 @@
     <list default="true" id="8ef2a1c9-f8a9-4cc5-a1b2-3ebc57edd92d" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../web app/public/javascripts/home.js" beforeDir="false" afterPath="$PROJECT_DIR$/../web app/public/javascripts/home.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web app/public/stylesheets/home.css" beforeDir="false" afterPath="$PROJECT_DIR$/../web app/public/stylesheets/home.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web app/views/home.pug" beforeDir="false" afterPath="$PROJECT_DIR$/../web app/views/home.pug" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
