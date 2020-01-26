@@ -1,12 +1,10 @@
 let getRectangleEditor = function (index) {
     return `<form id="info">
-                        <label for="x">x coord<input id="x" type="number" value="x" placeholder="${history[index].x}" onchange="x=value"/></label><br/>
-                        <label for="y">y coord<input id="y" type="number" value="y" placeholder="${history[index].y}" onchange="y=value"/></label><br/>
-                        <label for="toX">toX coord<input id="toX" type="number" value="toX" placeholder="${history[index].toX}" onchange="toX=value"/></label><br/>
-                        <label for="toY">toY coord<input id="toY" type="number" value="toY" placeholder="${history[index].toY}" onchange="toY=value"/></label><br/>
-                        <label for="width">width<input id="width" type="number" value="width" placeholder="${history[index].width}" onchange="width=value"/></label><br/>
-                        <label for="height">height<input id="height" type="number" value="height" placeholder="${history[index].height}" onchange="height=value"/></label><br/>
-                        <label for="colorR">Color<input id="colorR" type="color" value="color" placeholder="${history[index].color}" onchange="colorR=value"/></label><br/>
+                        <label for="x">x coord<input id="x" type="number"  placeholder="${history[index].x}"/></label><br/>
+                        <label for="y">y coord<input id="y" type="number"  placeholder="${history[index].y}"/></label><br/>
+                        <label for="toX">toX coord<input id="toX" type="number" placeholder="${history[index].toX}"/></label><br/>
+                        <label for="toY">toY coord<input id="toY" type="number" placeholder="${history[index].toY}"/></label><br/>
+                        <label for="colorR">Color<input id="colorR" type="color"  placeholder="${history[index].color}"/></label><br/>
                         </form>`;
 };
 let getLineEditor = function (index) {
