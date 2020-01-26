@@ -9,17 +9,23 @@ function createProject(serverData) {
     let title = document.createElement('h1');
     let button = document.createElement('button');
     let buttonText = document.createElement('span');
+    let buttonDelete = document.createElement('button');
+    let deleteProj = document.createElement('span');
     let thumbnail = document.createElement('img');
     let image_url = `http://localhost:4747/projects/photo/${localStorage.getItem('ecaw-username')}/${serverData._id}/canvas`;
     if (imageExists(image_url)) {
         thumbnail.crossOrigin = "Anonymous";
         thumbnail.src = image_url;
-    }else{
-        thumbnail.src='images/empty.png';
+    } else {
+        thumbnail.src = 'images/empty.png';
     }
     buttonText.className = "button-text";
     buttonText.innerHTML = "Open";
+    deleteProj.className = "button-delete";
+    deleteProj.innerHTML = "Delete Project";
+    buttonDelete.style.marginLeft = '10px';
     button.className = "button";
+    buttonDelete.className = "button";
     button.addEventListener('click', (e) => {
         window.location.href = `/projects?projectId=${serverData._id}`;
     });
@@ -28,8 +34,13 @@ function createProject(serverData) {
     project.appendChild(thumbnail);
     project.appendChild(title);
     project.appendChild(button);
+    project.appendChild(buttonDelete);
     button.appendChild(buttonText);
+    buttonDelete.appendChild(deleteProj);
     catalog.appendChild(project);
+}
+function deleteProject(projectId) {
+
 }
 
 function clearProjects() {
