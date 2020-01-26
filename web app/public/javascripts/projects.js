@@ -304,23 +304,23 @@ function changeInfo(shape, index) {
         let X = document.getElementById("x");
         X.addEventListener('change', (e) => {
             if (X.value !== undefined) {
-                selectedItem.x = X.value;
+                selectedItem.x = parseInt(X.value);
                 changeSelection(selectedItem, new SelectRect(selectedItem.x, selectedItem.y, selectedItem.toX, selectedItem.toY));
             }
         });
         let Y = document.getElementById("y");
         Y.addEventListener('change', (e) => {
-            selectedItem.y = Y.value;
+            selectedItem.y = parseInt(Y.value);
             changeSelection(selectedItem, new SelectRect(selectedItem.x, selectedItem.y, selectedItem.toX, selectedItem.toY));
         });
         let toX = document.getElementById("toX");
         toX.addEventListener('change', (e) => {
-            selectedItem.toX = toX.value;
+            selectedItem.toX = parseInt(toX.value);
             changeSelection(selectedItem, new SelectRect(selectedItem.x, selectedItem.y, selectedItem.toX, selectedItem.toY));
         });
         let toY = document.getElementById("toY");
         toY.addEventListener('change', (e) => {
-            selectedItem.toY = toY.value;
+            selectedItem.toY = parseInt(toY.value);
             changeSelection(selectedItem, new SelectRect(selectedItem.x, selectedItem.y, selectedItem.toX, selectedItem.toY));
         });
         let localColor = document.getElementById("colorL");
@@ -333,26 +333,26 @@ function changeInfo(shape, index) {
         let localX = document.getElementById("x");
         localX.addEventListener('change', (e) => {
             if (localX.value !== undefined) {
-                selectedItem.x = localX.value;
+                selectedItem.x = parseInt(localX.value);
                 console.log(localX.value);
                 changeSelection(selectedItem, new SelectRect(selectedItem.x, selectedItem.y, selectedItem.toX, selectedItem.toY));
             }
         });
         let localY = document.getElementById("y");
         localY.addEventListener('change', (e) => {
-            selectedItem.y = localY.value;
+            selectedItem.y = parseInt(localY.value);
             console.log(localY.value);
             changeSelection(selectedItem, new SelectRect(selectedItem.x, selectedItem.y, selectedItem.toX, selectedItem.toY));
         });
         let toX = document.getElementById("toX");
         toX.addEventListener('change', (e) => {
-            selectedItem.toX = toX.value;
+            selectedItem.toX = parseInt(toX.value);
             console.log(toX.value);
             changeSelection(selectedItem, new SelectRect(selectedItem.x, selectedItem.y, selectedItem.toX, selectedItem.toY));
         });
         let toY = document.getElementById("toY");
         toY.addEventListener('change', (e) => {
-            selectedItem.toY = toY.value;
+            selectedItem.toY = parseInt(toY.value);
             console.log(toY.value);
             changeSelection(selectedItem, new SelectRect(selectedItem.x, selectedItem.y, selectedItem.toX, selectedItem.toY));
         });
@@ -370,17 +370,17 @@ function changeInfo(shape, index) {
         document.getElementById('history').innerHTML += getCircleEditor(index);
         let localX = document.getElementById("centerX");
         localX.addEventListener('change', (e) => {
-            selectedItem.centerX = localX.value;
+            selectedItem.centerX = parseInt(localX.value);
             changeSelection(selectedItem, new SelectRect(selectedItem.x, selectedItem.y, selectedItem.toX, selectedItem.toY));
         });
         let localY = document.getElementById("centerY");
         localY.addEventListener('change', (e) => {
-            selectedItem.centerY = localY.value;
+            selectedItem.centerY = parseInt(localY.value);
             changeSelection(selectedItem, new SelectRect(selectedItem.x, selectedItem.y, selectedItem.toX, selectedItem.toY));
         });
         let localRadius = document.getElementById("radius");
         localRadius.addEventListener('change', (e) => {
-            selectedItem.radius = localRadius.value;
+            selectedItem.radius = parseInt(localRadius.value);
             changeSelection(selectedItem, new SelectRect(selectedItem.x, selectedItem.y, selectedItem.toX, selectedItem.toY));
         });
         selectedItem.x = selectedItem.centerX - selectedItem.radius;
