@@ -21,6 +21,12 @@ head
     br
     button#floodFill(onclick="changeCurrentShape('fill')") Flood Fill
     br
+    button#extract(onclick="changeCurrentShape('extract')") Extract Color
+    br
+    label.container
+        | Add photo
+    input#image(type='file' name='canvas' accept='image/x-png,image/gif,image/jpeg')
+    br
     button#saveBtn(onclick='save()') Save
     br
     button#restoreBtn(onclick='restore()') Restore

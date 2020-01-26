@@ -3,10 +3,12 @@ class ServerData {
     rectangles = [];
     lines = [];
     ellipses = [];
+    title = "Untitled";
 
-    constructor(history=[], username, projectId) {
+    constructor(history = [], username, projectId, title) {
         this.username = username;
         this._id = projectId;
+        this.title = title;
         for (let i = 0; i < history.length; i++) {
             if (history[i] instanceof Rectangle) {
                 this.rectangles.push(history[i]);

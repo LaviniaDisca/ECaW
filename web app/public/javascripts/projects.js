@@ -36,6 +36,32 @@ ghostContext = canvasBack.getContext("2d");
 let context = canvas.getContext('2d');
 //a clean white canvas is needed for the flood fill tool
 drawRectangle(context, 0, 0, canvas.width, canvas.height, "#ffffff", true);
+restore();
+
+document.getElementById('image').addEventListener('change', function (e) {
+    let image = e.target.files[0];
+    let img = new Image;
+    img.onload = function() {
+        context.drawImage(img, 20,20,500,500);
+        alert('the image is drawn');
+    };
+    img.src = URL.createObjectURL(e.target.files[0]);
+    /*let req = new XMLHttpRequest();
+    let formData = new FormData();
+    formData.append("canvas", image, "test.png");
+    req.open("POST", `http://localhost:4747/projects/photo/${projectId}`, true);
+    req.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('ecaw-jwt'));
+    req.onreadystatechange = function () {
+        if (req.readyState === XMLHttpRequest.DONE) {
+            if (req.status === 200) {
+                console.log(req.responseText);
+            } else {
+                console.log(req.responseText);
+            }
+        }
+    };
+    req.send(formData)*/
+});
 
 /**
  * Clears the screen and draws all the shapes from history
@@ -129,6 +155,10 @@ function handleMouseDown(e) {
     startX = e.offsetX;
     startY = e.offsetY;
     isDown = true;
+    if (selectedOption === "extract") {
+        let pixel = context.getImageData(startX, startY, 1, 1).data;
+        document.getElementById('color').value = "#" + ("000000" + hexOf(pixel[0], pixel[1], pixel[2])).slice(-6);
+    }
     if (selectedOption === 'text') {
         currentText = new TextInput(e.offsetX, startY, []);
         history.push(currentText);
@@ -165,7 +195,7 @@ function handleMouseDown(e) {
     redraw();
 }
 
-function createHistoryButton(type){
+function createHistoryButton(type) {
     let newOb = document.createElement('button');
     let capitalizedName = type.charAt(0).toUpperCase() + type.slice(1);
     newOb.innerHTML = `${capitalizedName} ${nbR}`;
@@ -635,6 +665,12 @@ function rgbOf(color) {
     return {r: r, g: g, b: b};
 }
 
+function hexOf(r, g, b) {
+    if (r > 255 || g > 255 || b > 255)
+        throw "Invalid color component";
+    return ((r << 16) | (g << 8) | b).toString(16);
+}
+
 /**
  * Options triggers
  */
@@ -683,6 +719,7 @@ function asd() {
 }
 
 function save() {
+    changeSelection(undefined, undefined);
     let req = new XMLHttpRequest();
     req.open("POST", `http://localhost:4747/projects/${projectId}`, true);
     req.setRequestHeader('Content-Type', 'application/json');
@@ -702,7 +739,7 @@ function save() {
             }
         }
     };
-    req.send(JSON.stringify(new ServerData(history, localStorage.getItem('ecaw-username'), parseInt(projectId))));
+    req.send(JSON.stringify(new ServerData(history, localStorage.getItem('ecaw-username'), parseInt(projectId), `Project ${projectId}`)));
 }
 
 function updateServerCanvas(canvasType) {
@@ -745,7 +782,6 @@ function restore() {
     img.src = `http://localhost:4747/projects/photo/${localStorage.getItem('ecaw-username')}/${projectId}/canvas-back`;
 
     let req = new XMLHttpRequest();
-    console.log(`http://localhost:4747/projects/${projectId}`);
     req.open("GET", `http://localhost:4747/projects/${projectId}`, true);
     req.setRequestHeader('Content-Type', 'application/json');
     req.onreadystatechange = function () {

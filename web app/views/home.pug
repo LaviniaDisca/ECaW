@@ -9,36 +9,22 @@ header
     nav
         ul
             li
-                a(href='Logout.html')
-                    span.nav-icon
-                        i.fas.fa-sign-out-alt
+                a#logOut
                     span.nav-option Logout
 main
     p.title
         | Your Projects
-    .catalog
+    .catalog#catalog
+        .new-product
+            img(src='images/back.png')
+            h1 Empty
+            button.button
+                span.button-text#create-new Create new Project
         .product
+            img(src='images/back.png')
             h1 Empty
             button.button
                 span.button-text Create new Project
-        .product
-            // <img src="images/cappuccino.jpg" alt="capuccino">
-            h1 Project No1
-            button.button
-                span.button-text Open
-        .product
-            h1 Project No2
-            button.button
-                span.button-text Open
-        .product
-            h1 Project No3
-            button.button
-                span.button-text Open
-        .product
-            h1 Project No4
-            button.button
-                span.button-text Open
-        .product
-            h1 Project No5
-            button.button
-                span.button-text Open
+
+script(src='javascripts/home.js')
+script(src='javascripts/Models/ServerData.js')

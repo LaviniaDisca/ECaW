@@ -6,6 +6,7 @@ let jwtChecker = require('../jwt');
 let photo = require('../multer');
 let path = require('path');
 let fs = require('fs');
+let rimraf = require("rimraf");
 
 
 let createFolder = function (req, res, next) {
@@ -14,6 +15,24 @@ let createFolder = function (req, res, next) {
         fs.mkdirSync(path.join(__dirname, filePath), {recursive: true});
     }
     next();
+};
+
+let findNextId = function (req, res, next) {
+    mongoDB.connect(databaseURL.databaseURL, function (err, client) {
+        if (err) throw err;
+        let db = client.db('ecaw');
+        db.collection('projects').find().sort({_id: -1}).toArray(function (err, result) {
+            if (err) throw err;
+            let id = 1;
+            console.log(result);
+            if (result.length > 0) {
+                id = parseInt(result[0]._id) + 1;
+            }
+            req.id = id;
+            next();
+        })
+
+    });
 };
 
 router.get('/photo/:username/:projectId/:canvas', function (req, res, next) {
@@ -38,6 +57,32 @@ router.get('/', jwtChecker.verifyToken, jwtChecker.validateToken, function (req,
             res.send(result);
         })
     });
+});
+
+router.post('/empty', jwtChecker.verifyToken, jwtChecker.validateToken, findNextId, function (req, res) {
+    mongoDB.connect(databaseURL.databaseURL, function (err, client) {
+        if (err) throw err;
+        let db = client.db('ecaw');
+
+        db.collection('projects').insert({
+            _id: req.id,
+            title:"Untitled",
+            username: req.decoded.username,
+            circles: [],
+            rectangles: [],
+            lines: [],
+            ellipses: []
+        }, function (err) {
+            if (err) throw err;
+            else {
+                res.send({
+                    success: true,
+                    message: "New project created",
+                    id: req.id
+                });
+            }
+        });
+    })
 });
 
 //returns the project with id projectId (no token needed here because the cards can be shared without the need of authentication)
@@ -104,18 +149,24 @@ router.post('/:projectId', jwtChecker.verifyToken, jwtChecker.validateToken, fun
     });
 });
 
-router.delete('/:projectId', function (req, res) {
+router.delete('/:projectId', jwtChecker.verifyToken, jwtChecker.validateToken, function (req, res, next) {
     mongoDB.connect(databaseURL.databaseURL, function (err, client) {
         if (err) throw err;
         let db = client.db('ecaw');
 
         db.collection('projects').remove({_id: parseInt(req.params.projectId)}, function (err, result) {
             if (err) throw err;
-            res.send({
-                success: true,
-                message: "Project deleted"
-            })
+            next();
         })
+    })
+}, function (req, res) {
+    let filePath = `../uploads/${req.decoded.username}/${parseInt(req.params.projectId)}`;
+    if (fs.existsSync(path.join(__dirname, filePath))) {
+        rimraf.sync(path.join(__dirname, filePath));
+    }
+    res.send({
+        success: true,
+        message: "Project deleted"
     })
 });
 

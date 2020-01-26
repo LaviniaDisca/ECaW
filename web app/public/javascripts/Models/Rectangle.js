@@ -13,13 +13,7 @@ class Rectangle {
     }
 }
 
-//todo: add image on canvas
-
 //todo: keyboard shortcuts
-
-//todo : extract color?
-
-//todo: images on projects
 
 //todo: scrollable history + back + save
 
