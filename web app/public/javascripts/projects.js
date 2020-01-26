@@ -163,7 +163,7 @@ function handleMouseDown(e) {
         currentText = new TextInput(e.offsetX, startY, []);
         history.push(currentText);
         nbT++;
-        createHistoryButton('text', nbT);
+        createHistoryButton('text', nbT, history.length - 1);
     }
     if (selectedOption === "selector") {
         // if the mouse is over a handle don't try to search for another shape
@@ -194,11 +194,11 @@ function handleMouseDown(e) {
     redraw();
 }
 
-function createHistoryButton(type, index) {
+function createHistoryButton(type, shapeIndex, historyIndex) {
     let newOb = document.createElement('button');
     let capitalizedName = type.charAt(0).toUpperCase() + type.slice(1);
-    newOb.innerHTML = `${capitalizedName} ${index}`;
-    newOb.value = `${history.length - 1}`;
+    newOb.innerHTML = `${capitalizedName} ${shapeIndex}`;
+    newOb.value = `${historyIndex}`;
     newOb.addEventListener('click', (e) => {
         let item = history[parseInt(newOb.value)];
         changeSelection(item, new SelectRect(item.x, item.y, item.toX, item.toY));
@@ -217,19 +217,19 @@ function handleMouseUp(e) {
         if (selectedOption === "rectangle" && endX !== undefined) {
             history.push(new Rectangle(startX, startY, endX, endY, color, fill));
             nbR++;
-            createHistoryButton('rectangle', nbR);
+            createHistoryButton('rectangle', nbR,history.length-1);
         } else if (selectedOption === "line" && endX !== undefined) {
             history.push(new Line(startX, startY, endX, endY, color));
             nbL++;
-            createHistoryButton('line', nbL);
+            createHistoryButton('line', nbL,history.length-1);
         } else if (selectedOption === "ellipse" && endX !== undefined) {
             history.push(new Ellipse(startX, startY, endX, endY, color, fill));
             nbE++;
-            createHistoryButton('ellipse', nbE);
+            createHistoryButton('ellipse', nbE,history.length-1);
         } else if (selectedOption === "circle" && endX !== undefined) {
             history.push(new Circle(startX, startY, 50, color, fill));
             nbC++;
-            createHistoryButton('circle', nbC);
+            createHistoryButton('circle', nbC,history.length-1);
             redraw();
         }
     }
@@ -979,18 +979,19 @@ function restore() {
                 history.forEach((item) => {
                     if (item instanceof Rectangle) {
                         nbR++;
-                        createHistoryButton('rectangle', nbR);
+                        createHistoryButton('rectangle', nbR,history.indexOf(item));
                     } else if (item instanceof Line) {
                         nbL++;
-                        createHistoryButton('line', nbL);
+                        createHistoryButton('line', nbL,history.indexOf(item));
                     } else if (item instanceof Ellipse) {
                         nbE++;
-                        createHistoryButton('ellipse', nbE);
+                        createHistoryButton('ellipse', nbE,history.indexOf(item));
                     } else if (item instanceof Circle) {
                         nbC++;
-                        createHistoryButton('circle', nbC);
+                        createHistoryButton('circle', nbC,history.indexOf(item));
                     }
                 });
+                console.log(history);
                 redraw();
             } else if (req.status === 401) {
                 console.log("error");
