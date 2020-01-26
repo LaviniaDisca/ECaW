@@ -21,8 +21,6 @@ class Rectangle {
 
 //todo: images on projects
 
-//todo: scrollable history + back + save
-
 //todo: another one hidden
 
 //todo: celebrate when it's over

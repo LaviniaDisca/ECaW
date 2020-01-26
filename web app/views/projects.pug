@@ -44,10 +44,13 @@ canvas
     button#saveproject
         i.far.fa-save
         |  Save Project
+    br
+    label.projTitle Title
+    input#projectTitle(type='text')
 #history.history
 
 script.
-    projectId="#{projectId}";
+    projectId = "#{projectId}";
 script(src='javascripts/Models/Circle.js')
 script(src='javascripts/Models/ServerData.js')
 script(src='javascripts/Models/SelectRect.js')
