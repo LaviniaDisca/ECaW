@@ -1,5 +1,5 @@
 let getRectangleEditor = function (index) {
-    return `<form >
+    return `<form id="info">
                         <label for="x">x coord<input id="x" type="number" value="x" placeholder="${history[index].x}" onchange="x=value"/></label><br/>
                         <label for="y">y coord<input id="y" type="number" value="y" placeholder="${history[index].y}" onchange="y=value"/></label><br/>
                         <label for="toX">toX coord<input id="toX" type="number" value="toX" placeholder="${history[index].toX}" onchange="toX=value"/></label><br/>
@@ -10,7 +10,7 @@ let getRectangleEditor = function (index) {
                         </form>`;
 };
 let getLineEditor = function (index) {
-    return `<form>
+    return `<form id="info">
                         <label for="x">x coord<input id="x" type="number" value="x" placeholder="${history[index].x}" onchange="x=value"/></label><br/>
                         <label for="y">y coord<input id="y" type="number" value="y" placeholder="${history[index].y}" onchange="y=value"/></label><br/>
                         <label for="toX">toX coord<input id="toX" type="number" value="toX" placeholder="${history[index].toX}" onchange="toX=value"/></label><br/>
@@ -20,7 +20,7 @@ let getLineEditor = function (index) {
 };
 
 let getEllipseEditor = function (index) {
-    return `<form>
+    return `<form id="info">
                         <label for="x">x coord<input id="x" type="number" value="x" placeholder="${history[index].x}" onchange="x=value"/></label><br/>
                         <label for="y">y coord<input id="y" type="number" value="y" placeholder="${history[index].y}" onchange="y=value"/></label><br/>
                         <label for="toX">toX coord<input id="toX" type="number" value="toX" placeholder="${history[index].toX}" onchange="toX=value"/></label><br/>
@@ -31,7 +31,7 @@ let getEllipseEditor = function (index) {
 };
 
 let getCircleEditor = function (index) {
-    return `<form>
+    return `<form id="info">
                         <label for="centerX">centerX coord<input id="centerX" type="number" value="centerX" placeholder="${history[index].x}" onchange="centerX=value"/></label><br/>
                         <label for="centerY">centerY coord<input id="centerY" type="number" value="centerY" placeholder="${history[index].y}" onchange="centerY=value"/></label><br/>
                         <label for="radius">radius coord<input id="radius" type="number" value="radius" placeholder="${history[index].toX}" onchange="radius=value"/></label><br/>

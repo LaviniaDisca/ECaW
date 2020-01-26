@@ -133,8 +133,7 @@ function handleMouseDown(e) {
         currentText = new TextInput(e.offsetX, startY, []);
         history.push(currentText);
         nbT++;
-        const newOb = `<button id="t" value="${history.length - 1}">Text ${nbT}</button><br>`;
-        document.getElementById('history').innerHTML += newOb;
+        createHistoryButton('text', nbT);
     }
     if (selectedOption === "selector") {
         // if the mouse is over a handle don't try to search for another shape
@@ -222,32 +221,32 @@ function changeInfo(shape, index) {
         let Y = document.getElementById("y");
         Y.addEventListener('change', (e) => {
             selectedItem.y = Y.value;
-            changeSelection(selectedItem, new SelectRect(selectedItem.x, selectedItem.y, selectedItem.toX, selectedItem.toY))
+            changeSelection(selectedItem, new SelectRect(selectedItem.x, selectedItem.y, selectedItem.toX, selectedItem.toY));
         });
         let toX = document.getElementById("toX");
         toX.addEventListener('change', (e) => {
             selectedItem.toX = toX.value;
-            changeSelection(selectedItem, new SelectRect(selectedItem.x, selectedItem.y, selectedItem.toX, selectedItem.toY))
+            changeSelection(selectedItem, new SelectRect(selectedItem.x, selectedItem.y, selectedItem.toX, selectedItem.toY));
         });
         let toY = document.getElementById("toY");
         toY.addEventListener('change', (e) => {
             selectedItem.toY = toY.value;
-            changeSelection(selectedItem, new SelectRect(selectedItem.x, selectedItem.y, selectedItem.toX, selectedItem.toY))
+            changeSelection(selectedItem, new SelectRect(selectedItem.x, selectedItem.y, selectedItem.toX, selectedItem.toY));
         });
         let localWidth = document.getElementById("width");
         localWidth.addEventListener('change', (e) => {
             selectedItem.width = localWidth.value;
-            changeSelection(selectedItem, new SelectRect(selectedItem.x, selectedItem.y, selectedItem.toX, selectedItem.toY))
+            changeSelection(selectedItem, new SelectRect(selectedItem.x, selectedItem.y, selectedItem.toX, selectedItem.toY));
         });
         let localHeight = document.getElementById("height");
         localHeight.addEventListener('change', (e) => {
             selectedItem.height = localHeight.value;
-            changeSelection(selectedItem, new SelectRect(selectedItem.x, selectedItem.y, selectedItem.toX, selectedItem.toY))
+            changeSelection(selectedItem, new SelectRect(selectedItem.x, selectedItem.y, selectedItem.toX, selectedItem.toY));
         });
         let localColor = document.getElementById("colorR");
         localColor.addEventListener('change', (e) => {
             selectedItem.color = localColor.value;
-            changeSelection(selectedItem, new SelectRect(selectedItem.x, selectedItem.y, selectedItem.toX, selectedItem.toY))
+            changeSelection(selectedItem, new SelectRect(selectedItem.x, selectedItem.y, selectedItem.toX, selectedItem.toY));
         });
     } else if (shape === 'line') {
         document.getElementById('history').innerHTML += getLineEditor(index);
@@ -261,83 +260,88 @@ function changeInfo(shape, index) {
         let Y = document.getElementById("y");
         Y.addEventListener('change', (e) => {
             selectedItem.y = Y.value;
-            changeSelection(selectedItem, new SelectRect(selectedItem.x, selectedItem.y, selectedItem.toX, selectedItem.toY))
+            changeSelection(selectedItem, new SelectRect(selectedItem.x, selectedItem.y, selectedItem.toX, selectedItem.toY));
         });
         let toX = document.getElementById("toX");
         toX.addEventListener('change', (e) => {
             selectedItem.toX = toX.value;
-            changeSelection(selectedItem, new SelectRect(selectedItem.x, selectedItem.y, selectedItem.toX, selectedItem.toY))
+            changeSelection(selectedItem, new SelectRect(selectedItem.x, selectedItem.y, selectedItem.toX, selectedItem.toY));
         });
         let toY = document.getElementById("toY");
         toY.addEventListener('change', (e) => {
             selectedItem.toY = toY.value;
-            changeSelection(selectedItem, new SelectRect(selectedItem.x, selectedItem.y, selectedItem.toX, selectedItem.toY))
+            changeSelection(selectedItem, new SelectRect(selectedItem.x, selectedItem.y, selectedItem.toX, selectedItem.toY));
         });
         let localColor = document.getElementById("colorL");
         localColor.addEventListener('change', (e) => {
             selectedItem.color = localColor.value;
-            changeSelection(selectedItem, new SelectRect(selectedItem.x, selectedItem.y, selectedItem.toX, selectedItem.toY))
+            changeSelection(selectedItem, new SelectRect(selectedItem.x, selectedItem.y, selectedItem.toX, selectedItem.toY));
         });
     } else if (shape === 'ellipse') {
         document.getElementById('history').innerHTML += getEllipseEditor(index);
-        let X = document.getElementById("x");
-        X.addEventListener('change', (e) => {
-            if (X.value !== undefined) {
-                selectedItem.x = X.value;
+        let localX = document.getElementById("x");
+        localX.addEventListener('change', (e) => {
+            if (localX.value !== undefined) {
+                selectedItem.x = localX.value;
+                console.log(localX.value);
                 changeSelection(selectedItem, new SelectRect(selectedItem.x, selectedItem.y, selectedItem.toX, selectedItem.toY));
             }
         });
-        let Y = document.getElementById("y");
-        Y.addEventListener('change', (e) => {
-            selectedItem.y = Y.value;
-            changeSelection(selectedItem, new SelectRect(selectedItem.x, selectedItem.y, selectedItem.toX, selectedItem.toY))
+        let localY = document.getElementById("y");
+        localY.addEventListener('change', (e) => {
+            selectedItem.y = localY.value;
+            console.log(localY.value);
+            changeSelection(selectedItem, new SelectRect(selectedItem.x, selectedItem.y, selectedItem.toX, selectedItem.toY));
         });
         let toX = document.getElementById("toX");
         toX.addEventListener('change', (e) => {
             selectedItem.toX = toX.value;
-            changeSelection(selectedItem, new SelectRect(selectedItem.x, selectedItem.y, selectedItem.toX, selectedItem.toY))
+            console.log(toX.value);
+            changeSelection(selectedItem, new SelectRect(selectedItem.x, selectedItem.y, selectedItem.toX, selectedItem.toY));
         });
         let toY = document.getElementById("toY");
         toY.addEventListener('change', (e) => {
             selectedItem.toY = toY.value;
-            changeSelection(selectedItem, new SelectRect(selectedItem.x, selectedItem.y, selectedItem.toX, selectedItem.toY))
+            console.log(toY.value);
+            changeSelection(selectedItem, new SelectRect(selectedItem.x, selectedItem.y, selectedItem.toX, selectedItem.toY));
         });
-        let localCoor = document.getElementById("colorE");
-        localCoor.addEventListener('change', (e) => {
-            selectedItem.color = localCoor.value;
-            changeSelection(selectedItem, new SelectRect(selectedItem.x, selectedItem.y, selectedItem.toX, selectedItem.toY))
+        let localColor = document.getElementById("colorE");
+        localColor.addEventListener('change', (e) => {
+            selectedItem.color = localColor.value;
+            changeSelection(selectedItem, new SelectRect(selectedItem.x, selectedItem.y, selectedItem.toX, selectedItem.toY));
         });
-        let localFill = document.getElementById("fill");
-        localFill.addEventListener('change', (e) => {
-            selectedItem.fill = localFill.value;
-            changeSelection(selectedItem, new SelectRect(selectedItem.x, selectedItem.y, selectedItem.toX, selectedItem.toY))
-        });
+        // let localFill = document.getElementById("fill");
+        // localFill.addEventListener('change', (e) => {
+        //     selectedItem.fill = localFill.value;
+        //     changeSelection(selectedItem, new SelectRect(selectedItem.x, selectedItem.y, selectedItem.toX, selectedItem.toY));
+        // });
     } else if (shape === 'circle') {
         document.getElementById('history').innerHTML += getCircleEditor(index);
         let localX = document.getElementById("centerX");
         localX.addEventListener('change', (e) => {
             selectedItem.centerX = localX.value;
-            changeSelection(selectedItem, new SelectRect(selectedItem.x, selectedItem.y, selectedItem.toX, selectedItem.toY))
+            changeSelection(selectedItem, new SelectRect(selectedItem.x, selectedItem.y, selectedItem.toX, selectedItem.toY));
         });
         let localY = document.getElementById("centerY");
         localY.addEventListener('change', (e) => {
             selectedItem.centerY = localY.value;
-            changeSelection(selectedItem, new SelectRect(selectedItem.x, selectedItem.y, selectedItem.toX, selectedItem.toY))
+            changeSelection(selectedItem, new SelectRect(selectedItem.x, selectedItem.y, selectedItem.toX, selectedItem.toY));
         });
         let localRadius = document.getElementById("radius");
         localRadius.addEventListener('change', (e) => {
             selectedItem.radius = localRadius.value;
-            changeSelection(selectedItem, new SelectRect(selectedItem.x, selectedItem.y, selectedItem.toX, selectedItem.toY))
+            changeSelection(selectedItem, new SelectRect(selectedItem.x, selectedItem.y, selectedItem.toX, selectedItem.toY));
         });
+        selectedItem.x = selectedItem.centerX - selectedItem.radius;
+        selectedItem.y = selectedItem.centerY - selectedItem.radius;
+        selectedItem.x = selectedItem.centerX + selectedItem.radius;
+        selectedItem.y = selectedItem.centerY + selectedItem.radius;
+        selectedItem.resizeX(x, toX);
+
         let localColor = document.getElementById("colorC");
         localColor.addEventListener('change', (e) => {
             selectedItem.color = localColor.value;
-            changeSelection(selectedItem, new SelectRect(selectedItem.x, selectedItem.y, selectedItem.toX, selectedItem.toY))
-        });
-        let localFill = document.getElementById("fill");
-        localFill.addEventListener('change', (e) => {
-            selectedItem.fill = localFill.value;
-            changeSelection(selectedItem, new SelectRect(selectedItem.x, selectedItem.y, selectedItem.toX, selectedItem.toY))
+            changeSelection(selectedItem, new SelectRect(selectedItem.x, selectedItem.y, selectedItem.toX, selectedItem.toY));
         });
     }
 }
@@ -347,6 +351,8 @@ function changeSelection(item, selectR) {
     selectedItem = item;
     if (item === undefined) {
         //todo: remove the form from the document
+        let form = document.getElementById('info');
+        form.parentNode.removeChild(form);
     }
     redraw();
 }
