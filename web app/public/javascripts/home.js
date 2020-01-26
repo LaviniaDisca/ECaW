@@ -29,6 +29,9 @@ function createProject(serverData) {
     button.addEventListener('click', (e) => {
         window.location.href = `/projects?projectId=${serverData._id}`;
     });
+    buttonDelete.addEventListener('click', (ev) => {
+        deleteProject(`${serverData._id}`);
+    });
     title.innerHTML = `${serverData.title}`;
     project.className = "product";
     project.appendChild(thumbnail);
@@ -39,8 +42,29 @@ function createProject(serverData) {
     buttonDelete.appendChild(deleteProj);
     catalog.appendChild(project);
 }
-function deleteProject(projectId) {
 
+function deleteProject(id) {
+    let req = new XMLHttpRequest();
+    req.open("DELETE", `http://localhost:4747/projects/${id}`, true);
+    req.setRequestHeader('Content-Type', 'application/json');
+    req.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('ecaw-jwt'));
+    req.onreadystatechange = function () {
+        if (req.readyState === XMLHttpRequest.DONE) {
+            let result = JSON.parse(req.responseText);
+            if (req.status === 200) {
+                if (result.success) {
+                    // window.alert(result.message);
+                    window.location.href = "/home";
+                } else {
+                    window.alert(result.message);
+                }
+            } else {
+                window.alert(result.message);
+                console.log("error");
+            }
+        }
+    };
+    req.send(null);
 }
 
 function clearProjects() {
