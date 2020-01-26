@@ -66,7 +66,7 @@ router.post('/empty', jwtChecker.verifyToken, jwtChecker.validateToken, findNext
 
         db.collection('projects').insert({
             _id: req.id,
-            title:"Untitled",
+            title: "Untitled",
             username: req.decoded.username,
             circles: [],
             rectangles: [],
@@ -150,16 +150,42 @@ router.post('/:projectId', jwtChecker.verifyToken, jwtChecker.validateToken, fun
 });
 
 router.delete('/:projectId', jwtChecker.verifyToken, jwtChecker.validateToken, function (req, res, next) {
+    /**
+     * First find and check if the project is owned by the user
+     */
+
     mongoDB.connect(databaseURL.databaseURL, function (err, client) {
         if (err) throw err;
         let db = client.db('ecaw');
 
-        db.collection('projects').remove({_id: parseInt(req.params.projectId)}, function (err, result) {
-            if (err) throw err;
-            next();
-        })
+        db.collection('projects').findOne({_id: parseInt(req.params.projectId)}, function (err, result) {
+            if (result) {
+                if (result.username !== req.decoded.username) {
+                    res.status(401).send({
+                        success: false,
+                        message: "You do not own this project"
+                    })
+                } else {
+                    /**
+                     * Delete the project
+                     */
+                    db.collection('projects').remove({_id: parseInt(req.params.projectId)}, function (err, result) {
+                        if (err) throw err;
+                        next();
+                    })
+                }
+            } else {
+                res.status(404).send({
+                    success: false,
+                    message: "No such project"
+                })
+            }
+        });
     })
 }, function (req, res) {
+    /**
+     * Delete all it's data
+     */
     let filePath = `../uploads/${req.decoded.username}/${parseInt(req.params.projectId)}`;
     if (fs.existsSync(path.join(__dirname, filePath))) {
         rimraf.sync(path.join(__dirname, filePath));

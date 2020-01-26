@@ -156,7 +156,8 @@ function handleMouseDown(e) {
     isDown = true;
     if (selectedOption === "extract") {
         let pixel = context.getImageData(startX, startY, 1, 1).data;
-        document.getElementById('color').value = "#" + ("000000" + hexOf(pixel[0], pixel[1], pixel[2])).slice(-6);
+        color = "#" + ("000000" + hexOf(pixel[0], pixel[1], pixel[2])).slice(-6);
+        document.getElementById('color').value = color;
     }
     if (selectedOption === 'text') {
         currentText = new TextInput(e.offsetX, startY, []);
@@ -876,9 +877,10 @@ canvas.addEventListener('mousemove', (e) => {
  * Downloads the ghost canvas locally
  * Used for debugging
  */
-function asd() {
+function downloadCanvas() {
+    console.log("downloading");
     document.getElementById("downloader").download = "image.png";
-    document.getElementById("downloader").href = canvasBack.toDataURL("image/png").replace(/^data:image\/[^;]/, 'data:application/octet-stream');
+    document.getElementById("downloader").href = canvas.toDataURL("image/png").replace(/^data:image\/[^;]/, 'data:application/octet-stream');
 }
 
 function save() {
@@ -902,7 +904,14 @@ function save() {
             }
         }
     };
-    req.send(JSON.stringify(new ServerData(history, localStorage.getItem('ecaw-username'), parseInt(projectId), `Project ${projectId}`)));
+    let title = document.getElementById('projectTitle').value;
+    if (title.length < 1) {
+        title = `Project ${projectId}`;
+    }
+    if (title.length > 15) {
+        title = title.substring(15);
+    }
+    req.send(JSON.stringify(new ServerData(history, localStorage.getItem('ecaw-username'), parseInt(projectId), title)));
 }
 
 function updateServerCanvas(canvasType) {
@@ -953,7 +962,23 @@ function restore() {
                 let components = JSON.parse(req.responseText);
                 let serverData = new ServerData();
                 serverData.restore(components);
+                document.getElementById('projectTitle').value = serverData.title;
                 history = serverData.toHistoryArray();
+                history.forEach((item) => {
+                    if (item instanceof Rectangle) {
+                        nbR++;
+                        createHistoryButton('rectangle', nbR);
+                    } else if (item instanceof Line) {
+                        nbL++;
+                        createHistoryButton('line', nbL);
+                    } else if (item instanceof Ellipse) {
+                        nbE++;
+                        createHistoryButton('ellipse', nbE);
+                    } else if (item instanceof Circle) {
+                        nbC++;
+                        createHistoryButton('circle', nbC);
+                    }
+                });
                 redraw();
             } else if (req.status === 401) {
                 console.log("error");

@@ -27,12 +27,6 @@ head
         | Add photo
     input#image(type='file' name='canvas' accept='image/x-png,image/gif,image/jpeg')
     br
-    button#saveBtn(onclick='save()') Save
-    br
-    button#restoreBtn(onclick='restore()') Restore
-    br
-    button#testbtn(onclick='test()') TEST
-    br
     label.container
         | Fill
         input#fill.option-input.checkbox(type='checkbox' onchange='fill=checked')
@@ -40,19 +34,19 @@ head
     label.col(for='color') Color
     input#color(type='color' value='color' onchange='color=value')
     br
-    a#downloader.buttonDownload(href='#' onclick='asd()' download='image.png') Download!
+    a#downloader.buttonDownload(href='#' onclick='downloadCanvas()' download='image.png') Download!
     br
 canvas
 .menu
     button#backpage
         i.fas.fa-arrow-left
         |  Back
-    button#saveproject
+    button#saveproject(onclick='save()')
         i.far.fa-save
         |  Save Project
     br
     label.projTitle Title
-    input#projectTitle(type='text')
+    input#projectTitle(type='text' maxlength='15')
 #history.history
 
 script.
