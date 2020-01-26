@@ -143,7 +143,7 @@ body {
 }
 
 .title {
-    color: #37987A;
+    color: black;
     text-align: center;
     height: 2em;
     line-height: 3em;
@@ -186,12 +186,12 @@ body {
     padding: 2px;
 }
 
-.product h1,.new-product h1 {
+.product h1, .new-product h1 {
     padding: 2px;
     color: white;
 }
 
-.product .button,.new-product .button {
+.product .button, .new-product .button {
     padding: 2px;
 }
 
@@ -218,4 +218,16 @@ body {
 
 .button:hover .button-text {
     color: white;
+}
+
+.button-delete {
+    background-color: #b00a0a;
+    border: 3px solid #b00a0a;
+    border-radius: 10px;
+    padding: 4px;
+}
+
+.button:hover .button-delete {
+    color: white;
+    background-color: #da001b;
 }

@@ -9,27 +9,62 @@ function createProject(serverData) {
     let title = document.createElement('h1');
     let button = document.createElement('button');
     let buttonText = document.createElement('span');
+    let buttonDelete = document.createElement('button');
+    let deleteProj = document.createElement('span');
     let thumbnail = document.createElement('img');
     let image_url = `http://localhost:4747/projects/photo/${localStorage.getItem('ecaw-username')}/${serverData._id}/canvas`;
     if (imageExists(image_url)) {
         thumbnail.crossOrigin = "Anonymous";
         thumbnail.src = image_url;
-    }else{
-        thumbnail.src='images/empty.png';
+    } else {
+        thumbnail.src = 'images/empty.png';
     }
     buttonText.className = "button-text";
     buttonText.innerHTML = "Open";
+    deleteProj.className = "button-delete";
+    deleteProj.innerHTML = "Delete Project";
+    buttonDelete.style.marginLeft = '10px';
     button.className = "button";
+    buttonDelete.className = "button";
     button.addEventListener('click', (e) => {
         window.location.href = `/projects?projectId=${serverData._id}`;
+    });
+    buttonDelete.addEventListener('click', (ev) => {
+        deleteProject(`${serverData._id}`);
     });
     title.innerHTML = `${serverData.title}`;
     project.className = "product";
     project.appendChild(thumbnail);
     project.appendChild(title);
     project.appendChild(button);
+    project.appendChild(buttonDelete);
     button.appendChild(buttonText);
+    buttonDelete.appendChild(deleteProj);
     catalog.appendChild(project);
+}
+
+function deleteProject(id) {
+    let req = new XMLHttpRequest();
+    req.open("DELETE", `http://localhost:4747/projects/${id}`, true);
+    req.setRequestHeader('Content-Type', 'application/json');
+    req.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('ecaw-jwt'));
+    req.onreadystatechange = function () {
+        if (req.readyState === XMLHttpRequest.DONE) {
+            let result = JSON.parse(req.responseText);
+            if (req.status === 200) {
+                if (result.success) {
+                    // window.alert(result.message);
+                    window.location.href = "/home";
+                } else {
+                    window.alert(result.message);
+                }
+            } else {
+                window.alert(result.message);
+                console.log("error");
+            }
+        }
+    };
+    req.send(null);
 }
 
 function clearProjects() {
