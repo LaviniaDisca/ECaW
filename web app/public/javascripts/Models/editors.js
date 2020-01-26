@@ -24,7 +24,6 @@ let getEllipseEditor = function (index) {
                         <label for="toX">toX coord<input id="toX" type="number" value="toX" placeholder="${history[index].toX}" onchange="toX=value"/></label><br/>
                         <label for="toY">toY coord<input id="toY" type="number" value="toY" placeholder="${history[index].toY}" onchange="toY=value"/></label><br/>
                         <label for="colorE">Color<input id="colorE" type="color" value="color" placeholder="${history[index].color}" onchange="colorE=value"/></label><br/>
-                        <label for="fill">fill<input id="fill" type="checkbox" value="fill" placeholder="${history[index].width}" onchange="fill=value"/></label><br/>
                         </form>`;
 };
 
@@ -34,6 +33,6 @@ let getCircleEditor = function (index) {
                         <label for="centerY">centerY coord<input id="centerY" type="number" value="centerY" placeholder="${history[index].y}" onchange="centerY=value"/></label><br/>
                         <label for="radius">radius coord<input id="radius" type="number" value="radius" placeholder="${history[index].toX}" onchange="radius=value"/></label><br/>
                         <label for="colorC">Color<input id="colorC" type="color" value="color" placeholder="${history[index].color}" onchange="colorC=value"/></label><br/>
-                        <label for="fill">fill<input id="fill" type="checkbox" value="fill" placeholder="${history[index].width}" onchange="fill=value"/></label><br/>
+<!--                        <label for="fill">fill<input id="fill" type="checkbox" value="fill" placeholder="${history[index].width}" onchange="fill=value"/></label><br/>-->
                         </form>`;
 };
