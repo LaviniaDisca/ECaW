@@ -14,12 +14,10 @@ document.getElementById('form').addEventListener('submit', (e) => {
                     window.alert(result.message);
                     window.location.href="/";
                 } else {
-                    //todo:show error message
                     window.alert(result.message);
                     console.log("Login failed");
                 }
             } else {
-                //todo:show error message
                 window.alert(result.message);
                 console.log("error");
             }

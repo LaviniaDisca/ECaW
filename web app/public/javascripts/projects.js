@@ -12,7 +12,8 @@ let nbR = 0,
     nbC = 0,
     nbE = 0,
     nbT = 0,
-    nbL = 0;
+    nbL = 0,
+    nbI = 0;
 let token = localStorage.getItem("ecaw-jwt");
 
 console.log(projectId);
@@ -40,27 +41,10 @@ restore();
 
 document.getElementById('image').addEventListener('change', function (e) {
     let image = e.target.files[0];
-    let img = new Image;
-    img.onload = function () {
-        context.drawImage(img, 20, 20, 500, 500);
-        alert('the image is drawn');
-    };
-    img.src = URL.createObjectURL(e.target.files[0]);
-    /*let req = new XMLHttpRequest();
-    let formData = new FormData();
-    formData.append("canvas", image, "test.png");
-    req.open("POST", `http://localhost:4747/projects/photo/${projectId}`, true);
-    req.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('ecaw-jwt'));
-    req.onreadystatechange = function () {
-        if (req.readyState === XMLHttpRequest.DONE) {
-            if (req.status === 200) {
-                console.log(req.responseText);
-            } else {
-                console.log(req.responseText);
-            }
-        }
-    };
-    req.send(formData)*/
+    history.push(new ImageLocal(20, 20, 500, 500, image));
+    nbI++;
+    createHistoryButton('image', nbI, history.length - 1);
+    redraw();
 });
 
 /**
@@ -71,22 +55,26 @@ function redraw() {
     drawRectangle(context, 0, 0, canvas.width, canvas.height, "#ffffff", true);
     context.drawImage(canvasBack, 0, 0);
     for (let i = 0; i < history.length; i++) {
-        if (history[i] instanceof Rectangle) {
-            drawRectangle(context, history[i].x, history[i].y, history[i].toX, history[i].toY, history[i].color, history[i].fill);
-        } else if (history[i] instanceof Line) {
-            drawLine(context, history[i].x, history[i].y, history[i].toX, history[i].toY, history[i].color, history[i].fill);
-        } else if (history[i] instanceof Ellipse) {
-            drawEllipse(context, history[i].x, history[i].y, history[i].toX, history[i].toY, history[i].color, history[i].fill);
-        } else if (history[i] instanceof Circle) {
-            drawCircle(context, history[i].centerX, history[i].centerY, history[i].radius, history[i].color, history[i].fill);
-        } else if (history[i] instanceof TextInput) {
-            let x = history[i].startingX;
-            let y = history[i].startY;
-            history[i].words.forEach((key) => {
-                let increase = drawKey(key, x, y, history[i].startingX);
-                x += increase.x;
-                y += increase.y;
-            });
+        if (history[i].active) {
+            if (history[i] instanceof Rectangle) {
+                drawRectangle(context, history[i].x, history[i].y, history[i].toX, history[i].toY, history[i].color, history[i].fill);
+            } else if (history[i] instanceof Line) {
+                drawLine(context, history[i].x, history[i].y, history[i].toX, history[i].toY, history[i].color, history[i].fill);
+            } else if (history[i] instanceof Ellipse) {
+                drawEllipse(context, history[i].x, history[i].y, history[i].toX, history[i].toY, history[i].color, history[i].fill);
+            } else if (history[i] instanceof Circle) {
+                drawCircle(context, history[i].centerX, history[i].centerY, history[i].radius, history[i].color, history[i].fill);
+            } else if (history[i] instanceof ImageLocal) {
+                drawImage(history[i]);
+            } else if (history[i] instanceof TextInput) {
+                let x = history[i].startingX;
+                let y = history[i].startY;
+                history[i].words.forEach((key) => {
+                    let increase = drawKey(key, x, y, history[i].startingX, history[i].fontSize, history[i].color);
+                    x += increase.x;
+                    y += increase.y;
+                });
+            }
         }
     }
     // Draw the selection rect if there's one
@@ -99,14 +87,16 @@ function drawGhost() {
     ghostContext.clearRect(0, 0, context.canvas.width, context.canvas.height);
     ghostContext.drawImage(canvas, 0, 0);
     for (let i = 0; i < history.length; i++) {
-        if (history[i] instanceof Rectangle) {
-            drawRectangle(ghostContext, history[i].x, history[i].y, history[i].toX, history[i].toY, "#ffffff", history[i].fill);
-        } else if (history[i] instanceof Line) {
-            drawLine(ghostContext, history[i].x, history[i].y, history[i].toX, history[i].toY, "#ffffff", history[i].fill);
-        } else if (history[i] instanceof Ellipse) {
-            drawEllipse(ghostContext, history[i].x, history[i].y, history[i].toX, history[i].toY, "#ffffff", history[i].fill);
-        } else if (history[i] instanceof Circle) {
-            drawCircle(ghostContext, history[i].centerX, history[i].centerY, history[i].radius, "#ffffff", history[i].fill);
+        if (history[i].active) {
+            if (history[i] instanceof Rectangle) {
+                drawRectangle(ghostContext, history[i].x, history[i].y, history[i].toX, history[i].toY, "#ffffff", history[i].fill);
+            } else if (history[i] instanceof Line) {
+                drawLine(ghostContext, history[i].x, history[i].y, history[i].toX, history[i].toY, "#ffffff", history[i].fill);
+            } else if (history[i] instanceof Ellipse) {
+                drawEllipse(ghostContext, history[i].x, history[i].y, history[i].toX, history[i].toY, "#ffffff", history[i].fill);
+            } else if (history[i] instanceof Circle) {
+                drawCircle(ghostContext, history[i].centerX, history[i].centerY, history[i].radius, "#ffffff", history[i].fill);
+            }
         }
     }
 }
@@ -125,6 +115,9 @@ let endY;
  */
 function drawSelectedShape() {
     drawRectangle(context, selectedShape.x, selectedShape.y, selectedShape.toX, selectedShape.toY, "red");
+    if (selectedItem instanceof TextInput) {
+        return;
+    }
     for (let i = 0; i < selectedShape.selectionHandles.length; i++) {
         //if the selected shape is a circle we only draw 2 handles
         if (selectedItem instanceof Circle) {
@@ -160,7 +153,7 @@ function handleMouseDown(e) {
         document.getElementById('color').value = color;
     }
     if (selectedOption === 'text') {
-        currentText = new TextInput(e.offsetX, startY, []);
+        currentText = new TextInput(e.offsetX, startY, [], color);
         history.push(currentText);
         nbT++;
         createHistoryButton('text', nbT, history.length - 1);
@@ -173,7 +166,7 @@ function handleMouseDown(e) {
         //finds the last item from history that the user is trying to select
         let found = false;
         history.slice().reverse().forEach((item) => {
-            if (!found && cursorInShape(e.offsetX, e.offsetY, item)) {
+            if (item.active && !found && cursorInShape(e.offsetX, e.offsetY, item)) {
                 changeSelection(item, new SelectRect(item.x, item.y, item.toX, item.toY));
                 found = true;
             }
@@ -217,19 +210,19 @@ function handleMouseUp(e) {
         if (selectedOption === "rectangle" && endX !== undefined) {
             history.push(new Rectangle(startX, startY, endX, endY, color, fill));
             nbR++;
-            createHistoryButton('rectangle', nbR,history.length-1);
+            createHistoryButton('rectangle', nbR, history.length - 1);
         } else if (selectedOption === "line" && endX !== undefined) {
             history.push(new Line(startX, startY, endX, endY, color));
             nbL++;
-            createHistoryButton('line', nbL,history.length-1);
+            createHistoryButton('line', nbL, history.length - 1);
         } else if (selectedOption === "ellipse" && endX !== undefined) {
             history.push(new Ellipse(startX, startY, endX, endY, color, fill));
             nbE++;
-            createHistoryButton('ellipse', nbE,history.length-1);
+            createHistoryButton('ellipse', nbE, history.length - 1);
         } else if (selectedOption === "circle" && endX !== undefined) {
             history.push(new Circle(startX, startY, 50, color, fill));
             nbC++;
-            createHistoryButton('circle', nbC,history.length-1);
+            createHistoryButton('circle', nbC, history.length - 1);
             redraw();
         }
     }
@@ -283,10 +276,22 @@ function changeInfo(shape, index) {
                 changeSelection(selectedItem, new SelectRect(selectedItem.x, selectedItem.y, selectedItem.toX, selectedItem.toY));
             }
         });
-        let localColor = document.getElementById("colorR");
+    }
+
+    function addColorListener() {
+        let localColor = document.getElementById("colorL");
         localColor.addEventListener('change', (e) => {
             selectedItem.color = localColor.value;
             changeSelection(selectedItem, new SelectRect(selectedItem.x, selectedItem.y, selectedItem.toX, selectedItem.toY));
+        });
+    }
+
+    function addActiveListener(){
+        let activeBox = document.getElementById('active');
+        activeBox.checked = selectedItem.active;
+        activeBox.addEventListener('change', (e) => {
+            selectedItem.active = activeBox.checked;
+            changeSelection(selectedItem, selectedShape);
         });
     }
 
@@ -300,112 +305,89 @@ function changeInfo(shape, index) {
         editor.innerHTML = getRectangleEditor(index);
         insertEditor(editor);
         addRectListeners();
+        addColorListener();
+        addActiveListener();
     } else if (shape === 'line') {
         let editor = document.createElement('div');
         editor.id = "editor";
         editor.innerHTML = getLineEditor(index);
         insertEditor(editor);
-        let X = document.getElementById("x");
-        X.addEventListener('change', (e) => {
-            if (X.value !== undefined) {
-                selectedItem.x = parseInt(X.value);
-                changeSelection(selectedItem, new SelectRect(selectedItem.x, selectedItem.y, selectedItem.toX, selectedItem.toY));
-            }
-        });
-        let Y = document.getElementById("y");
-        Y.addEventListener('change', (e) => {
-            if (Y.value !== undefined) {
-                selectedItem.y = parseInt(Y.value);
-                changeSelection(selectedItem, new SelectRect(selectedItem.x, selectedItem.y, selectedItem.toX, selectedItem.toY));
-            }
-        });
-        let toX = document.getElementById("toX");
-        toX.addEventListener('change', (e) => {
-            if (toX.value !== undefined) {
-                selectedItem.toX = parseInt(toX.value);
-                changeSelection(selectedItem, new SelectRect(selectedItem.x, selectedItem.y, selectedItem.toX, selectedItem.toY));
-            }
-        });
-        let toY = document.getElementById("toY");
-        toY.addEventListener('change', (e) => {
-            if (toY.value !== undefined) {
-                selectedItem.toY = parseInt(toY.value);
-                changeSelection(selectedItem, new SelectRect(selectedItem.x, selectedItem.y, selectedItem.toX, selectedItem.toY));
-            }
-        });
-        let localColor = document.getElementById("colorL");
-        localColor.addEventListener('change', (e) => {
-            selectedItem.color = localColor.value;
-            changeSelection(selectedItem, new SelectRect(selectedItem.x, selectedItem.y, selectedItem.toX, selectedItem.toY));
-        });
+        addRectListeners();
+        addColorListener();
+        addActiveListener();
     } else if (shape === 'ellipse') {
         let editor = document.createElement('div');
         editor.id = "editor";
         editor.innerHTML = getEllipseEditor(index);
         insertEditor(editor);
+        addRectListeners();
+        addColorListener();
+        addActiveListener();
+    } else if (shape === 'circle') {
+        let editor = document.createElement('div');
+        editor.id = "editor";
+        editor.innerHTML = getCircleEditor(index);
+        insertEditor(editor);
+        addActiveListener();
         let localX = document.getElementById("x");
         localX.addEventListener('change', (e) => {
             if (localX.value !== undefined) {
-                selectedItem.x = parseInt(localX.value);
+                selectedItem.move(localX.value - selectedItem.x, 0);
                 changeSelection(selectedItem, new SelectRect(selectedItem.x, selectedItem.y, selectedItem.toX, selectedItem.toY));
             }
         });
         let localY = document.getElementById("y");
         localY.addEventListener('change', (e) => {
             if (localY.value !== undefined) {
-                selectedItem.y = parseInt(localY.value);
-                changeSelection(selectedItem, new SelectRect(selectedItem.x, selectedItem.y, selectedItem.toX, selectedItem.toY));
-            }
-        });
-        let toX = document.getElementById("toX");
-        toX.addEventListener('change', (e) => {
-            if (toX.value !== undefined) {
-                selectedItem.toX = parseInt(toX.value);
-                changeSelection(selectedItem, new SelectRect(selectedItem.x, selectedItem.y, selectedItem.toX, selectedItem.toY));
-            }
-        });
-        let toY = document.getElementById("toY");
-        toY.addEventListener('change', (e) => {
-            if (toY.value !== undefined) {
-                selectedItem.toY = parseInt(toY.value);
-                changeSelection(selectedItem, new SelectRect(selectedItem.x, selectedItem.y, selectedItem.toX, selectedItem.toY));
-            }
-        });
-        let localColor = document.getElementById("colorE");
-        localColor.addEventListener('change', (e) => {
-            selectedItem.color = localColor.value;
-            changeSelection(selectedItem, new SelectRect(selectedItem.x, selectedItem.y, selectedItem.toX, selectedItem.toY));
-        });
-    } else if (shape === 'circle') {
-        let editor = document.createElement('div');
-        editor.id = "editor";
-        editor.innerHTML = getCircleEditor(index);
-        insertEditor(editor);
-        let localX = document.getElementById("centerX");
-        localX.addEventListener('change', (e) => {
-            if (localX.value !== undefined) {
-                selectedItem.centerX = parseInt(localX.value);
-                changeSelection(selectedItem, new SelectRect(selectedItem.x, selectedItem.y, selectedItem.toX, selectedItem.toY));
-            }
-        });
-        let localY = document.getElementById("centerY");
-        localY.addEventListener('change', (e) => {
-            if (localY.value !== undefined) {
-                selectedItem.centerY = parseInt(localY.value);
+                selectedItem.move(0, localY.value - selectedItem.y);
                 changeSelection(selectedItem, new SelectRect(selectedItem.x, selectedItem.y, selectedItem.toX, selectedItem.toY));
             }
         });
         let localRadius = document.getElementById("radius");
         localRadius.addEventListener('change', (e) => {
             if (localRadius.value !== undefined) {
-                selectedItem.radius = parseInt(localRadius.value);
+                selectedItem.setRadius(parseInt(localRadius.value));
+                selectedItem.resizeX(selectedItem.x, selectedItem.toX);
                 changeSelection(selectedItem, new SelectRect(selectedItem.x, selectedItem.y, selectedItem.toX, selectedItem.toY));
             }
         });
-        let localColor = document.getElementById("colorC");
-        localColor.addEventListener('change', (e) => {
-            selectedItem.color = localColor.value;
-            changeSelection(selectedItem, new SelectRect(selectedItem.x, selectedItem.y, selectedItem.toX, selectedItem.toY));
+        addColorListener();
+    } else if (shape === 'image') {
+        let editor = document.createElement('div');
+        editor.id = "editor";
+        editor.innerHTML = getRectangleEditor(index);
+        insertEditor(editor);
+        addRectListeners();
+        addActiveListener();
+    } else if (shape === "text") {
+        let editor = document.createElement('div');
+        editor.id = "editor";
+        editor.innerHTML = getTextEditor(index);
+        insertEditor(editor);
+        addColorListener();
+        addActiveListener();
+        let X = document.getElementById("x");
+        X.addEventListener('change', (e) => {
+            if (X.value !== undefined) {
+                selectedItem.startingX = parseInt(X.value);
+                changeSelection(selectedItem, new SelectRect(selectedItem.x, selectedItem.y, selectedItem.toX, selectedItem.toY));
+            }
+        });
+        let Y = document.getElementById("y");
+        Y.addEventListener('change', (e) => {
+            if (Y.value !== undefined) {
+                selectedItem.startY = parseInt(Y.value);
+                changeSelection(selectedItem, new SelectRect(selectedItem.x, selectedItem.y, selectedItem.toX, selectedItem.toY));
+            }
+        });
+        let fontSize = document.getElementById("fontSize");
+        fontSize.addEventListener('change', (e) => {
+            if (fontSize.value !== undefined) {
+                selectedItem.fontSize = parseInt(fontSize.value);
+                context.font = `${fontSize.value}px Arial`;
+                selectedItem.width = context.measureText(selectedItem.getLongestLine()).width;
+                changeSelection(selectedItem, new SelectRect(selectedItem.x, selectedItem.y, selectedItem.toX, selectedItem.toY));
+            }
         });
     }
 }
@@ -423,14 +405,18 @@ function changeSelection(item, selectR) {
             shape = "ellipse";
         } else if (item instanceof Circle) {
             shape = "circle";
+        } else if (item instanceof ImageLocal) {
+            shape = "image";
+        } else if (item instanceof TextInput) {
+            shape = "text";
         }
         changeInfo(shape, history.indexOf(item));
+    } else {
+        let historyTab = document.getElementById('history');
+        let editor = document.getElementById('editor');
+        if (editor)
+            historyTab.removeChild(editor);
     }
-    /*let form = document.getElementById('info');
-    if (item === undefined && form) {
-        //todo: remove the form from the document
-        form.parentNode.removeChild(form);
-    }*/
     redraw();
 }
 
@@ -444,7 +430,48 @@ function handleMouseMove(e) {
     //change the selected item size based on the handle that is being moved
     if (typeof currentHandle !== "undefined" && isDown && selectedOption === "selector") {
         //if it is not a circle we use all 9 handles
-        if (!(selectedItem instanceof Circle)) {
+        if (selectedItem instanceof Circle) {
+            switch (currentHandle) {
+                case 3:
+                    if (selectedItem instanceof Circle) {
+                        if (selectedItem.resizeX(endX, selectedItem.toX)) {
+                            selectedShape.x = selectedItem.x;
+                            selectedShape.toX = selectedItem.toX;
+                            selectedShape.y = selectedItem.y;
+                            selectedShape.toY = selectedItem.toY;
+                            changeSelection(selectedItem, selectedShape);
+                        }
+                    }
+                    break;
+                case 4:
+                    if (selectedItem.resizeX(selectedItem.x, endX)) {
+                        selectedShape.x = selectedItem.x;
+                        selectedShape.toX = selectedItem.toX;
+                        selectedShape.y = selectedItem.y;
+                        selectedShape.toY = selectedItem.toY;
+                        changeSelection(selectedItem, selectedShape);
+                    }
+                    break;
+                case 8:
+                    let offsetX = (endX - startX);
+                    let offsetY = (endY - startY);
+                    selectedItem.move(offsetX, offsetY);
+                    startX = endX;
+                    startY = endY;
+                    changeSelection(selectedItem, new SelectRect(selectedItem.x, selectedItem.y, selectedItem.toX, selectedItem.toY));
+                    break;
+            }
+        } else if (selectedItem instanceof TextInput) {
+            if (currentHandle === 8) {
+                let offsetX = (endX - startX);
+                let offsetY = (endY - startY);
+                selectedItem.startingX += offsetX;
+                selectedItem.startY += offsetY;
+                startX = endX;
+                startY = endY;
+                changeSelection(selectedItem, new SelectRect(selectedItem.x, selectedItem.y, selectedItem.toX, selectedItem.toY));
+            }
+        } else {
             switch (currentHandle) {
                 case 0:
                     selectedShape.x = endX;
@@ -501,39 +528,6 @@ function handleMouseMove(e) {
                     selectedItem.y += offsetY;
                     selectedItem.toX += offsetX;
                     selectedItem.toY += offsetY;
-                    startX = endX;
-                    startY = endY;
-                    changeSelection(selectedItem, new SelectRect(selectedItem.x, selectedItem.y, selectedItem.toX, selectedItem.toY));
-                    break;
-            }
-        }
-        //if we deal with a circle we only have 2 handles to show
-        else {
-            switch (currentHandle) {
-                case 3:
-                    if (selectedItem instanceof Circle) {
-                        if (selectedItem.resizeX(endX, selectedItem.toX)) {
-                            selectedShape.x = selectedItem.x;
-                            selectedShape.toX = selectedItem.toX;
-                            selectedShape.y = selectedItem.y;
-                            selectedShape.toY = selectedItem.toY;
-                            changeSelection(selectedItem, selectedShape);
-                        }
-                    }
-                    break;
-                case 4:
-                    if (selectedItem.resizeX(selectedItem.x, endX)) {
-                        selectedShape.x = selectedItem.x;
-                        selectedShape.toX = selectedItem.toX;
-                        selectedShape.y = selectedItem.y;
-                        selectedShape.toY = selectedItem.toY;
-                        changeSelection(selectedItem, selectedShape);
-                    }
-                    break;
-                case 8:
-                    let offsetX = (endX - startX);
-                    let offsetY = (endY - startY);
-                    selectedItem.move(offsetX, offsetY);
                     startX = endX;
                     startY = endY;
                     changeSelection(selectedItem, new SelectRect(selectedItem.x, selectedItem.y, selectedItem.toX, selectedItem.toY));
@@ -635,18 +629,19 @@ function handleTextKeyPress(key) {
             let lastWord = currentText.words.join("").split("Enter").reverse()[0];
             let length = context.measureText(lastWord).width;
             startX = currentText.startingX + length;
-            //todo:replace with fontsize+4
-            startY -= 20;
+            startY -= currentText.fontSize + 4;
         } else {
             startX -= context.measureText(recentChar).width;
         }
         redraw();
     } else {
-        let increase = drawKey(key, startX, startY, currentText.startingX);
+        let increase = drawKey(key, startX, startY, currentText.startingX, currentText.fontSize, currentText.color);
         startX += increase.x;
         startY += increase.y;
         currentText.words.push(key);
+        currentText.width = context.measureText(currentText.getLongestLine()).width;
     }
+    changeSelection(currentText, new SelectRect(currentText.x, currentText.y, currentText.toX, currentText.toY));
 }
 
 /**
@@ -658,9 +653,8 @@ function handleTextKeyPress(key) {
 /**
  *  Draws a letter and modifies returns the adjustments to be done to x,y
  */
-function drawKey(key, x, y, startingX) {
-    //todo: add font-size and type to parameters and to the model
-    context.font = '16px Arial';
+function drawKey(key, x, y, startingX, fontSize, color) {
+    context.font = `${fontSize}px Arial`;
     let result = {
         x: 0,
         y: 0
@@ -668,7 +662,7 @@ function drawKey(key, x, y, startingX) {
     //handle the ENTER key
     if (key === "Enter") {
         result.x = startingX - x;
-        result.y += 20; //The size of the font + 4
+        result.y += fontSize + 4;
     } else {
         context.fillStyle = color;
         context.fillText(key, x, y);
@@ -722,10 +716,28 @@ function drawEllipse(context, x, y, toX, toY, color, fill = false) {
     }
 }
 
+function drawImage(localImage) {
+    if (!localImage.source) {
+        let img = new Image;
+        img.crossOrigin = "Anonymous";
+        img.onload = function () {
+            localImage.source = img;
+            context.drawImage(localImage.source, localImage.x, localImage.y, localImage.toX - localImage.x, localImage.toY - localImage.y)
+        };
+        if (typeof localImage.image === "string") {
+            img.src = localImage.image;
+        } else {
+            img.src = URL.createObjectURL(localImage.image);
+        }
+    } else {
+        context.drawImage(localImage.source, localImage.x, localImage.y, localImage.toX - localImage.x, localImage.toY - localImage.y)
+    }
+}
+
 function floodFill(startX, startY, startR, startG, startB, color) {
     let found = false;
     history.slice().reverse().forEach((item) => {
-        if (!(item instanceof Line) && !found && cursorInShape(startX, startY, item)) {
+        if (item.active && !(item instanceof Line) && !found && cursorInShape(startX, startY, item)) {
             item.color = color;
             item.fill = true;
             found = true;
@@ -871,7 +883,11 @@ document.addEventListener('keydown', (e) => {
         e.preventDefault();
         handleTextKeyPress(e.key);
     } else {
-        //todo: probably add shortcuts here?
+        if (e.key === "Delete" && selectedItem) {
+            selectedItem.active = false;
+            changeSelection(undefined, undefined);
+            redraw();
+        }
     }
 });
 
@@ -896,6 +912,7 @@ function downloadCanvas() {
 }
 
 function save() {
+    saveImages();
     changeSelection(undefined, undefined);
     let req = new XMLHttpRequest();
     req.open("POST", `http://localhost:4747/projects/${projectId}`, true);
@@ -924,6 +941,31 @@ function save() {
         title = title.substring(15);
     }
     req.send(JSON.stringify(new ServerData(history, localStorage.getItem('ecaw-username'), parseInt(projectId), title)));
+}
+
+
+function saveImages() {
+    history.forEach((item) => {
+        if (item instanceof ImageLocal) {
+            if (typeof item.image !== "string") {
+                let req = new XMLHttpRequest();
+                let formData = new FormData();
+                formData.append("canvas", item.image, `image${history.indexOf(item)}.png`);
+                req.open("POST", `http://localhost:4747/projects/photo/${projectId}`, true);
+                req.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('ecaw-jwt'));
+                req.onreadystatechange = function () {
+                    if (req.readyState === XMLHttpRequest.DONE) {
+                        if (req.status === 200) {
+                            console.log(req.responseText);
+                        } else {
+                            console.log(req.responseText);
+                        }
+                    }
+                };
+                req.send(formData)
+            }
+        }
+    });
 }
 
 function updateServerCanvas(canvasType) {
@@ -979,19 +1021,24 @@ function restore() {
                 history.forEach((item) => {
                     if (item instanceof Rectangle) {
                         nbR++;
-                        createHistoryButton('rectangle', nbR,history.indexOf(item));
+                        createHistoryButton('rectangle', nbR, history.indexOf(item));
                     } else if (item instanceof Line) {
                         nbL++;
-                        createHistoryButton('line', nbL,history.indexOf(item));
+                        createHistoryButton('line', nbL, history.indexOf(item));
                     } else if (item instanceof Ellipse) {
                         nbE++;
-                        createHistoryButton('ellipse', nbE,history.indexOf(item));
+                        createHistoryButton('ellipse', nbE, history.indexOf(item));
                     } else if (item instanceof Circle) {
                         nbC++;
-                        createHistoryButton('circle', nbC,history.indexOf(item));
+                        createHistoryButton('circle', nbC, history.indexOf(item));
+                    } else if (item instanceof ImageLocal) {
+                        nbI++;
+                        createHistoryButton('image', nbI, history.indexOf(item))
+                    } else if (item instanceof TextInput) {
+                        nbT++;
+                        createHistoryButton('text', nbT, history.indexOf(item))
                     }
                 });
-                console.log(history);
                 redraw();
             } else if (req.status === 401) {
                 console.log("error");

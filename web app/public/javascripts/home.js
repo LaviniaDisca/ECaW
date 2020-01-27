@@ -53,8 +53,7 @@ function deleteProject(id) {
             let result = JSON.parse(req.responseText);
             if (req.status === 200) {
                 if (result.success) {
-                    // window.alert(result.message);
-                    window.location.href = "/home";
+                    loadProjects()
                 } else {
                     window.alert(result.message);
                 }

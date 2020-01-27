@@ -1,6 +1,5 @@
 class Rectangle {
-    index = 0;
-
+    active=true;
     constructor(x, y, toX, toY, color, fill) {
         this.x = x;
         this.y = y;
@@ -14,9 +13,5 @@ class Rectangle {
 }
 
 //todo: keyboard shortcuts
-
-//todo: scrollable history + back + save
-
-//todo: another one hidden
 
 //todo: celebrate when it's over

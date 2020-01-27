@@ -15,12 +15,10 @@ document.getElementById('form').addEventListener('submit', (e) => {
                     localStorage.setItem("ecaw-username", user.value);
                     window.location.href = "/home"
                 } else {
-                    //todo:show error message
                     window.alert(result.message);
                     console.log("Login failed");
                 }
             } else {
-                //todo:show error message
                 window.alert(result.message);
                 console.log("error");
             }

@@ -1,14 +1,12 @@
 class Circle {
+    active=true;
     constructor(centerX, centerY, radius, color, fill) {
         this.radius = radius;
         this.centerX = centerX;
         this.centerY = centerY;
         this.color = color;
         this.fill = fill;
-        this.x = this.centerX - this.radius;
-        this.y = this.centerY - this.radius;
-        this.toX = this.centerX + this.radius;
-        this.toY = this.centerY + this.radius;
+        this.setRadius(radius);
     }
 
     resizeX(x, toX) {
@@ -29,6 +27,13 @@ class Circle {
         this.toX += offsetX;
         this.toY += offsetY;
         this.recenter();
+    }
+
+    setRadius(radius){
+        this.x = this.centerX - radius;
+        this.y = this.centerY - radius;
+        this.toX = this.centerX + radius;
+        this.toY = this.centerY + radius;
     }
 
     recenter(){
