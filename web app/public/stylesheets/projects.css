@@ -196,17 +196,17 @@ body {
 }
 
 .button {
-    text-align: center;
-    display: inline-block;
-    font-size: 1em;
-    margin-top: 10px;
-    cursor: pointer;
-    background-color: #37987A;
-    color: black;
-    border: 3px solid #37987A;
-    border-radius: 10px;
-    padding: 20px;
-}
+     text-align: center;
+     display: inline-block;
+     font-size: 1em;
+     margin-top: 10px;
+     cursor: pointer;
+     background-color: #37987A;
+     color: black;
+     border: 3px solid #37987A;
+     border-radius: 10px;
+     padding: 20px;
+ }
 
 .button .button-text {
     padding: 4px;
@@ -216,7 +216,23 @@ body {
     background-color: green;
 }
 
-.button:hover .button-text {
+.button-del {
+    text-align: center;
+    display: inline-block;
+    font-size: 1em;
+    margin-top: 10px;
+    cursor: pointer;
+    background-color: rgba(0,0,0,0);
+    color: black;
+    border: 3px solid rgba(0,0,0,0);
+    border-radius: 10px;
+}
+
+.button-del .button-text {
+    padding: 4px;
+}
+
+.button-del:hover .button-text {
     color: white;
 }
 
@@ -227,7 +243,7 @@ body {
     padding: 4px;
 }
 
-.button:hover .button-delete {
+.button-del:hover .button-delete {
     color: white;
     background-color: #da001b;
 }

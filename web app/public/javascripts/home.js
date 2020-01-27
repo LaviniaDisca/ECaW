@@ -25,7 +25,7 @@ function createProject(serverData) {
     deleteProj.innerHTML = "Delete Project";
     buttonDelete.style.marginLeft = '10px';
     button.className = "button";
-    buttonDelete.className = "button";
+    buttonDelete.className = "button-del";
     button.addEventListener('click', (e) => {
         window.location.href = `/projects?projectId=${serverData._id}`;
     });

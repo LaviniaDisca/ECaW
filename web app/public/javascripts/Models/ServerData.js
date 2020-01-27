@@ -61,7 +61,7 @@ class ServerData {
             history[item.index].active = item.active;
         });
         this.texts.forEach((item) => {
-            history[item.index] = new TextInput(item.startingX, item.startY, item.words);
+            history[item.index] = new TextInput(item.startingX, item.startY, item.words,item.color);
             history[item.index].width = item.width;
             history[item.index].active = item.active;
         });

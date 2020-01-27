@@ -286,7 +286,7 @@ function changeInfo(shape, index) {
         });
     }
 
-    function addActiveListener(){
+    function addActiveListener() {
         let activeBox = document.getElementById('active');
         activeBox.checked = selectedItem.active;
         activeBox.addEventListener('change', (e) => {
@@ -633,8 +633,9 @@ function handleTextKeyPress(key) {
         } else {
             startX -= context.measureText(recentChar).width;
         }
+        currentText.width = context.measureText(currentText.getLongestLine()).width;
         redraw();
-    } else {
+    } else if (key === "Enter" || key.length === 1) {
         let increase = drawKey(key, startX, startY, currentText.startingX, currentText.fontSize, currentText.color);
         startX += increase.x;
         startY += increase.y;
@@ -663,7 +664,7 @@ function drawKey(key, x, y, startingX, fontSize, color) {
     if (key === "Enter") {
         result.x = startingX - x;
         result.y += fontSize + 4;
-    } else {
+    } else if (key.length === 1) {
         context.fillStyle = color;
         context.fillText(key, x, y);
 
@@ -886,7 +887,58 @@ document.addEventListener('keydown', (e) => {
         if (e.key === "Delete" && selectedItem) {
             selectedItem.active = false;
             changeSelection(undefined, undefined);
+            currentHandle = undefined;
+            canvas.style.cursor = 'crosshair';
             redraw();
+        } else if (e.ctrlKey && (e.key === "d" || e.key === "D")) {
+            e.preventDefault();
+            if (selectedItem) {
+                let itemCopy;
+                if (selectedItem instanceof Rectangle) {
+                    nbR++;
+                    itemCopy = new Rectangle();
+                    Object.assign(itemCopy, selectedItem);
+                    history.push(itemCopy);
+                    createHistoryButton('rectangle', nbR, history.length - 1);
+                    changeSelection(itemCopy, selectedShape);
+                } else if (selectedItem instanceof Line) {
+                    nbL++;
+                    itemCopy = new Line();
+                    Object.assign(itemCopy, selectedItem);
+                    history.push(itemCopy);
+                    createHistoryButton('line', nbL, history.length - 1);
+                    changeSelection(itemCopy, selectedShape);
+                } else if (selectedItem instanceof Ellipse) {
+                    nbE++;
+                    itemCopy = new Ellipse();
+                    Object.assign(itemCopy, selectedItem);
+                    history.push(itemCopy);
+                    createHistoryButton('ellipse', nbE, history.length - 1);
+                    changeSelection(itemCopy, selectedShape);
+                } else if (selectedItem instanceof Circle) {
+                    nbC++;
+                    itemCopy = new Circle();
+                    Object.assign(itemCopy, selectedItem);
+                    history.push(itemCopy);
+                    createHistoryButton('circle', nbC, history.length - 1);
+                    changeSelection(itemCopy, selectedShape);
+                } else if (selectedItem instanceof ImageLocal) {
+                    nbI++;
+                    itemCopy = new ImageLocal();
+                    Object.assign(itemCopy, selectedItem);
+                    history.push(itemCopy);
+                    createHistoryButton('image', nbI, history.length - 1);
+                    changeSelection(itemCopy, selectedShape);
+                } else if (selectedItem instanceof TextInput) {
+                    nbT++;
+                    itemCopy = new TextInput();
+                    Object.assign(itemCopy, selectedItem);
+                    history.push(itemCopy);
+                    createHistoryButton('text', nbT, history.length - 1);
+                    changeSelection(itemCopy, selectedShape);
+                }
+                console.log(itemCopy);
+            }
         }
     }
 });
