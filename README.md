@@ -1,7 +1,9 @@
+<!DOCTYPE html>
 <html style="background-color:lavender;">
 
 <head>
     <meta charset="utf-8">
+    <title>Project report</title>
 </head>
 
 <body prefix="schema: http://schema.org">
@@ -63,16 +65,16 @@
         <h3>Paginile Web</h3>
         <ul>
             <li>
-                <b>Login</b>: Utilizatorii se vor putea loga fie cu contul de facebook, fie cu contul de ECaW. Login-ul este necesar pentru a avea acces la proiectele personale sau la cele private la care are acces oferit de owner-ul proiectului.
+                <b>Login</b>: Utilizatorii se vor putea loga cu contul de ECaW. Login-ul este necesar pentru a putea modifica proiectele personale.
             </li>
             <li>
                 <b>Register</b>: In cazul in care utilizatorul nu are cont pe platforma, acesta isi va putea crea unul pe aceasta pagina.
             </li>
             <li>
-                <b>Home</b>: Aici utilizatorul va putea vedea lista proiectelor la care are acces, sau sa creeze un nou proiect. Va putea vedea continutul fiecarui proiect pentru a-l edita, descarca sau a-l impartasi pe Facebook, email, etc.
+                <b>Projects</b>: Aici utilizatorul va putea vedea lista proiectelor la care are acces, sau sa creeze un nou proiect. Va putea vedea continutul fiecarui proiect pentru a-l edita.
             </li>
             <li>
-                <b>Edit</b>: Pe aceasta pagina utilizatorul isi va putea da frau liber imaginatiei. Aici va putea sa isi creeze cardul pe care il doreste si sa impartaseasca accesul la proiect cu alti utilzatori.
+                <b>Home</b>: Pe aceasta pagina utilizatorul isi va putea da frau liber imaginatiei. Aici va putea sa isi creeze cardul pe care il doreste.
             </li>
         </ul>
     </section>
@@ -80,30 +82,35 @@
         <h3>Instrumente disponibile</h3>
         <ul>
             <li>
-                <b>Pencil drawing</b>: Deseneaza linii pe canvas.
+                <b>Line</b>: Deseneaza linii pe canvas.
             </li>
             <li>
                 <b>Text</b>: Inseareaza text.
             </li>
             <li>
-                <b>Shape</b>: Creeaza o forma simpla(patrat, dreptunghi, stea, etc).
+                <b>Rectangle</b>: Creeaza un dreptunghi.
+            </li>
+            <li>
+                <b>Ellipse</b>: Creeaza o elipsa.
+            </li>
+            <li>
+                <b>Circle</b>: Creeaza un cerc.
             </li>
             <li>
                 <b>Photo</b>: Inseareaza poze de pe dispozitivul local sau de pe API-ul de la Imgur.
             </li>
             <li>
-                <b>Resize</b>: Ajusteaza marimea oricarui obiect desenat.
+                <b>Resize/Move</b>: Ajusteaza marimea oricarui obiect desenat.
             </li>
             <li>
-                <b>Insert audio</b>: Adauga fundal sonor la proiect printr-un fisier .mp3 local.
+                <b>Flood fill</b>: Umple o suprafata cu o culoare.
             </li>
             <li>
-                <b>Save</b>: Salveaza proiectul in baza de date.
+                <b>Save Project</b>: Salveaza proiectul in baza de date.
             </li>
             <li>
-                <b>Share</b>: Impartaseste proiectul fie pe retele sociale, email, etc./ Permite accesul altor utilizatori sa isi adauge contributia la proiect.
+                <b>Download</b>: Descarca un png cu cardul.
             </li>
-
         </ul>
     </section>
     <section id="server">
@@ -112,26 +119,31 @@
         </h3>
         <ul>
             <li>
-                <b>/login</b>: Va verifica credentialele utilizatorului.
+                <b>POST/users/auth</b>: Va verifica credentialele utilizatorului.
             </li>
             <li>
-                <b>/register</b>: Va crea contul utilizatorului.
+                <b>POST/users/register</b>: Va crea contul utilizatorului.
             </li>
             <li>
-                <b>/projects</b>: Va trimite proiectele utilizatorului.
+                <b>GET/projects</b>: Va trimite proiectele utilizatorului.
             </li>
             <li>
-                <b>/projects/{id}</b>: In functie de tipul cererii(GET/POST/DELETE) va trimite proiectul cu acel id, va suprascrie proiectul respectiv va sterge proiectul.
+                <b>GET/projects/{id}</b>: Trimite datele proiectului cu id-ul respectiv.
             </li>
-        </ul>
-    </section>
-    <section>
-        <h3>
-            API-uri folosite
-        </h3>
-        <ul>
             <li>
-                <b>Imgur</b>: Va furniza pozele pe care le vor cauta utilizatorii in interiorul aplicatiei, pentru a fi incluse in proiect.
+                <b>POST/projects/{id}</b>: Actualizeaza datele proiectului.
+            </li>
+            <li>
+                <b>DELETE/projects/{id}</b>: Sterge un proiect.
+            </li>
+            <li>
+                <b>POST/projects/empty</b>: Creeaza un proiect gol.
+            </li>
+            <li>
+                <b>GET/projects/photo/{username}/{projectId}/{canvas}</b>: Trimite imaginea userului(username), pentru proiectul cu id-ul projectId, denumita {canvas}.
+            </li>
+            <li>
+                <b>POST/projects/photo/{projectId}</b>: Salveaza o poza pentru proiectul projectId.
             </li>
         </ul>
     </section>
@@ -140,14 +152,12 @@
         <figure typeof="sa:image">
             <img src="MVC.png" alt="MVC Diagram">
         </figure>
-        <p>
-            <ul>
-                <li><b>View</b>: reprezinta interfata grafica cu care interactioneaza utilizatorul</li>
-                <li><b>Controller</b>: interpreteaza inputurile provenite din View</li>
-                <li><b>Model</b>: trimite cereri serverului si proceseaza raspunsurile primite</li>
-                <li><b>Server</b>: se ocupa de managementul bazei de date si de autentificarea utilizatorilor</li>
-            </ul>
-        </p>
+        <ul>
+            <li><b>View</b>: reprezinta interfata grafica cu care interactioneaza utilizatorul</li>
+            <li><b>Controller</b>: interpreteaza inputurile provenite din View</li>
+            <li><b>Model</b>: trimite cereri serverului si proceseaza raspunsurile primite</li>
+            <li><b>Server</b>: se ocupa de managementul bazei de date si de autentificarea utilizatorilor</li>
+        </ul>
     </section>
     <section>
         <h3>Database Diagram</h3>
