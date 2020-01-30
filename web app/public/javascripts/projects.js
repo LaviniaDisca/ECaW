@@ -2,7 +2,6 @@ let canvas = document.querySelector('canvas');
 let selectedOption;
 let color = "#000000";
 let history = [];
-//Stores every word
 let selectedShape = undefined;
 let currentHandle = undefined;
 let fill = false;
