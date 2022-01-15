@@ -20,6 +20,6 @@
   "devDependencies": {
     "cors": "^2.8.5",
     "jsonwebtoken": "^8.5.1",
-    "shelljs": "^0.8.3"
+    "shelljs": "^0.8.5"
   }
 }
